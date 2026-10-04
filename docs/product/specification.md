@@ -1,10 +1,18 @@
-# Product Specification Baseline
+# Product Specification
 
-Task: `P02-A02-001`  
-Phase: `P02 — Product Specification`  
-Status: **INCOMPLETE — product decisions required**
+Product authority updated by: `P03-A02-002`  
+Prior baseline: `P02-A02-001`  
+Status: **PARTIALLY SPECIFIED — initial Android calendar capability authorized; broader product remains OPEN**
 
-## 1. Product identity
+This document records only product decisions explicitly authorized by the Product Owner. It does not define a complete financial-management product.
+
+## 1. Status vocabulary
+
+- **DECIDED** — explicitly approved and safe to treat as current product authority.
+- **OPEN** — not yet decided; implementation must not infer a requirement.
+- **OUT OF SCOPE** — explicitly excluded from the first implementation phase, without implying permanent rejection.
+
+## 2. Product identity
 
 **DECIDED**
 
@@ -12,153 +20,309 @@ Status: **INCOMPLETE — product decisions required**
 
 No additional product meaning is inferred from the identifier.
 
-## 2. Problem statement
+Traceability: prior baseline `P02-A02-001`; retained by `P03-A02-002`.
+
+## 3. Product Owner decision register
+
+### PD-001 — Initial user
+
+**DECIDED**
+
+The initial intended user is the repository owner himself.
+
+The public visibility of the repository does not make a public, multi-user, commercial, or general-consumer audience an approved requirement.
+
+Future expansion to other users or audiences is **OPEN**.
+
+Source: Product Owner decision supplied in task `P03-A02-002`.
+
+### PD-002 — Initial delivery surface
+
+**DECIDED**
+
+Android is the initial product delivery surface.
+
+Desktop/JVM is not an approved product delivery surface for the first implementation phase. Other delivery surfaces remain **OPEN** for future decisions and are not permanently rejected.
+
+Kotlin, Kotlin Multiplatform, Compose, Gradle, and other implementation technologies are not product decisions in this specification. They remain subject to engineering architecture and technical governance.
+
+Source: Product Owner decision supplied in task `P03-A02-002`.
+
+### PD-003 — Initial product capability
+
+**DECIDED**
+
+The only committed product capability is a calendar-oriented financial view.
+
+The initial user should be able to use a calendar-oriented experience to visualize financial items associated with dates, including examples such as:
+
+- amounts he owes or needs to pay;
+- obligations related to his credit cards;
+- income or gains.
+
+The calendar capability is the only currently committed feature. The broader product direction remains **OPEN**.
+
+This decision does not define detailed financial entities, calculations, workflows, or additional management capabilities.
+
+Source: Product Owner decision supplied in task `P03-A02-002`.
+
+### PD-004 — Calendar UX reference
+
+**DECIDED**
+
+Etar (`https://github.com/LineageOS/android_packages_apps_Etar`) is a non-normative UX/navigation reference for a calendar-style experience.
+
+The reference does not approve Etar's complete feature set, architecture, dependencies, data model, or integrations. Calendar Provider integration, synchronization, contacts, widgets, ICS import/export, multiple views, CalDAV-related workflows, and other Etar capabilities are not requirements unless separately approved.
+
+Source: Product Owner decision supplied in task `P03-A02-002`.
+
+### PD-005 — Data locality
+
+**DECIDED**
+
+For the initial product:
+
+- product data should remain local on the device;
+- no remote server or backend is required;
+- no cloud synchronization is approved;
+- no authentication or account infrastructure is required.
+
+This is an initial-scope decision, not a permanent architectural prohibition. Remote services, synchronization, accounts, and related infrastructure remain **OPEN** for future decisions.
+
+Persistence technology, database choice, schema, and exact data lifecycle remain **OPEN** technical/product-detail decisions.
+
+Source: Product Owner decision supplied in task `P03-A02-002`.
+
+## 4. Initial user problem and primary outcome
+
+### Initial need
+
+**DECIDED — narrow scope only**
+
+For the first capability, the repository owner wants to visualize dated financial items through a calendar-oriented Android experience.
+
+No broader problem statement is approved beyond this need.
+
+Traceability: `PD-001`, `PD-002`, `PD-003`; task `P03-A02-002`.
+
+### Primary outcome for the first capability
+
+**DECIDED**
+
+The initial user can view financial items in relation to dates and can distinguish money expected to enter from financial obligations expected to leave.
+
+Traceability: `PD-003`; task `P03-A02-002`.
+
+### Broader value proposition
 
 **OPEN**
 
-The repository does not yet define the user problem, operational problem, or business problem that this product must solve.
+The repository does not yet define the product as a complete financial manager, budgeting tool, accounting system, investment product, banking product, or other broader category.
 
-A valid problem statement should identify:
+## 5. Initial functional requirements
 
-- the affected user or operator;
-- the current pain or unmet need;
-- the context in which it occurs;
-- why solving it matters;
-- evidence or rationale for prioritizing it.
+### FR-001 — Calendar-oriented Android experience
 
-## 3. Target users
+**DECIDED**
 
-**OPEN**
+The first implementation shall provide an Android product experience centered on a calendar-oriented interface.
 
-No target user, persona, customer segment, administrator role, or machine consumer has been approved.
+Acceptance: see `AC-001`.
 
-Implementation agents must not assume whether this is a consumer app, internal tool, developer tool, service, automation, game, content project, or other product type.
+Source: `PD-002`, `PD-003`; task `P03-A02-002`.
 
-## 4. Value proposition and primary outcome
+### FR-002 — Dated financial items
 
-**OPEN**
+**DECIDED**
 
-The expected user-visible or operator-visible outcome has not been specified.
+The calendar experience shall be able to represent financial items associated with dates.
 
-The product owner should define one primary outcome that can be tested independently of implementation details.
+This requirement intentionally does not prescribe the entity schema, fields, persistence mechanism, or editing workflow.
 
-## 5. Product goals
+Acceptance: see `AC-002`.
 
-**OPEN**
+Source: `PD-003`; task `P03-A02-002`.
 
-No product goals are currently approved.
+### FR-003 — Financial direction
 
-Goals should be measurable where possible and should describe outcomes rather than technologies.
+**DECIDED**
 
-## 6. Non-goals
+The calendar experience shall distinguish financial items representing money expected to enter from financial obligations expected to leave.
 
-**OPEN**
+This requirement does not prescribe calculations, status systems, categories, color semantics, or visual encoding.
 
-No explicit non-goals are currently approved.
+Acceptance: see `AC-003`.
 
-Non-goals are required to prevent implementation agents from expanding scope through plausible but unauthorized features.
+Source: `PD-003`; task `P03-A02-002`.
 
-## 7. Functional requirements
+### FR-004 — No remote dependency for the initial experience
 
-**OPEN**
+**DECIDED**
 
-No functional requirements are currently approved.
+The first implementation shall be usable without requiring a remote server or user account.
 
-Each future functional requirement should include:
+This requirement does not select a persistence technology or permanently forbid future remote capabilities.
 
-- stable identifier;
-- requirement statement;
-- rationale;
-- acceptance criteria;
-- dependencies;
-- status;
-- source decision or owner.
+Acceptance: see `AC-004`.
 
-Recommended identifier format: `FR-###`.
+Source: `PD-005`; task `P03-A02-002`.
 
-## 8. Non-functional requirements
+## 6. Product-level acceptance criteria
 
-**OPEN**
+### AC-001
 
-No approved requirements exist yet for:
+An Android application can present a calendar-oriented interface.
 
-- performance;
-- availability;
-- accessibility;
-- privacy;
-- security;
-- observability;
-- portability;
-- localization;
-- compatibility;
-- maintainability;
-- cost constraints.
+### AC-002
 
-Recommended identifier format: `NFR-###`.
+Financial items associated with dates can be represented within that calendar experience.
 
-## 9. Data and external integrations
+### AC-003
 
-**OPEN**
+The experience can distinguish money expected to enter from financial obligations expected to leave.
 
-The repository does not specify data models, personal data, secrets, persistence, third-party APIs, external services, or system-of-record dependencies.
+### AC-004
 
-No agent should introduce an external dependency as a product requirement without an explicit decision.
+The demonstrated experience works without requiring a remote server or user account.
 
-## 10. UX and interaction model
+These criteria are product-level boundaries. They do not prescribe framework, language, database, storage engine, build system, or software architecture.
+
+Traceability for `AC-001` through `AC-004`: task `P03-A02-002`, decisions `PD-002`, `PD-003`, and `PD-005`.
+
+## 7. Data and integrations
+
+### Current data boundary
+
+**DECIDED**
+
+Data used by the initial product is local to the device. The initial scope does not require backend services, cloud synchronization, or authentication/account infrastructure.
+
+Traceability: `PD-005`; task `P03-A02-002`.
+
+### Data details
 
 **OPEN**
 
-No interaction model is approved. This includes UI, CLI, API, background automation, chat interaction, or other interfaces.
+The following remain undecided:
 
-## 11. Success metrics
+- exact financial-item entity model and fields;
+- exact credit-card model;
+- installment model;
+- recurrence behavior;
+- transaction or obligation status model;
+- persistence technology;
+- database or storage schema;
+- retention/deletion behavior beyond the current local-only boundary;
+- financial calculations;
+- monthly summaries or derived aggregates;
+- import/export behavior.
+
+No implementation choice may be promoted to product authority for these items without a later decision.
+
+## 8. UX and interaction model
+
+### Calendar interaction
+
+**DECIDED**
+
+The first product experience is calendar-oriented.
+
+Etar is a non-normative UX/navigation reference only.
+
+Traceability: `PD-003`, `PD-004`; task `P03-A02-002`.
+
+### UX details
 
 **OPEN**
 
-No product-level success metrics are defined.
+The following remain undecided:
 
-Metrics should be tied to the primary outcome and should distinguish product success from engineering health metrics.
+- exact calendar view structure;
+- navigation hierarchy;
+- date-selection behavior;
+- item-entry/editing workflow;
+- layout details;
+- visual styling;
+- color semantics;
+- accessibility targets beyond any platform baseline later adopted;
+- which, if any, Etar interaction patterns should be reproduced.
 
-## 12. Release scope and MVP gate
+## 9. Explicitly out of scope for the first implementation phase
 
-The MVP scope is **not ready for implementation sign-off** until, at minimum, the following are **DECIDED**:
+**OUT OF SCOPE**
 
-1. target user;
-2. problem statement;
-3. primary outcome;
-4. MVP functional requirements;
-5. explicit non-goals;
-6. acceptance criteria;
-7. required data and integrations;
-8. material security/privacy constraints;
-9. target runtime or delivery surface.
+Unless separately approved by a later Product Owner decision, the first implementation phase does not include:
 
-This gate does not prevent exploratory technical work authorized by another task, but such work must not be represented as approved product scope.
+- Desktop/JVM as a product delivery surface;
+- budgeting;
+- categories;
+- investment tracking;
+- net-worth tracking;
+- reports;
+- goals;
+- bank integrations;
+- transaction imports;
+- dashboards;
+- recurring-payment features;
+- notifications;
+- automation;
+- account synchronization;
+- cloud synchronization;
+- financial advice;
+- backend services;
+- authentication or account infrastructure.
 
-## 13. Assumption policy
+These exclusions limit the first implementation phase only. They are not permanent product rejections.
 
-Agents may record assumptions to continue non-destructive analysis, but assumptions must:
+Traceability: `PD-002`, `PD-003`, `PD-005`; task `P03-A02-002`.
 
-- be labeled **ASSUMPTION**;
-- state why the assumption is needed;
-- identify the decision that would confirm or invalidate it;
-- never be silently promoted to **DECIDED**.
+## 10. Still-open product questions
 
-## 14. Decision traceability
+**OPEN**
 
-Each product decision should record:
+Everything not explicitly decided above remains unresolved. Material open areas include:
 
-- decision identifier;
-- date;
-- decision owner;
-- TASK-ID or issue/PR reference;
-- options considered;
-- selected decision;
-- consequences or constraints.
+- broader future product direction;
+- whether the product will ever target users other than the repository owner;
+- future delivery surfaces beyond Android;
+- detailed creation, editing, deletion, and lifecycle behavior for financial items;
+- exact treatment of credit-card obligations and installments;
+- recurrence;
+- categories or other classification;
+- financial calculations and summaries;
+- reporting, dashboard, notification, automation, import, integration, and synchronization capabilities;
+- future remote services;
+- future authentication/account model;
+- data-retention and backup expectations;
+- security/privacy requirements beyond the current local-only/no-account boundary;
+- success metrics beyond satisfying the initial acceptance criteria;
+- release/distribution policy.
 
-Recommended decision identifier format: `PD-###`.
+Open items must not be filled by inference from implementation scaffolding or from the Etar reference.
 
-## 15. Unresolved ambiguities
+## 11. Relationship to technical scaffolding
 
-As of `P02-A02-001`, the product definition remains materially ambiguous because no prior Product and Agent Specification prompt or product requirements were present in the repository.
+PR #3 and any Kotlin/Multiplatform/Compose/Gradle scaffolding are technical evidence only.
 
-This ambiguity is deliberate in this baseline: missing requirements are documented as missing rather than invented.
+Current product authority is:
+
+- Android: **DECIDED** as the initial delivery surface;
+- Desktop/JVM: not approved for the first product scope;
+- Kotlin/Kotlin Multiplatform/Compose/Gradle: not product decisions.
+
+Engineering architecture and technical governance remain responsible for deciding whether any technical scaffold is acceptable under the product constraints now recorded.
+
+Traceability: task `P03-A02-002`.
+
+## 12. Implementation authorization boundary
+
+The repository now has sufficient product authority to evaluate an **Android-only technical foundation** for the narrow first capability defined by `FR-001` through `FR-004`.
+
+This does not authorize:
+
+- a complete product implementation beyond those requirements;
+- Desktop/JVM product delivery;
+- additional financial-management features;
+- a specific language, framework, multiplatform strategy, persistence technology, or architecture.
+
+Any broader implementation remains blocked on later Product Owner and/or architecture decisions, as applicable.
