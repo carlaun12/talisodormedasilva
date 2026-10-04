@@ -1,43 +1,39 @@
 # Product Specification
 
-Task baseline: `P02-A02-001`
+Baseline established by: `P02-A02-001`  
+Current product authority updated by: `P03-A02-002`
 
 ## Purpose
 
-This directory defines what the product is expected to do before implementation work is treated as product-approved.
+This directory defines approved product behavior and explicitly records what remains unresolved so implementation choices do not become accidental requirements.
 
-## Known facts
+## Current product authority
 
-- Project identifier: `talisodormedasilva`
-- Current phase: `P02 — Product Specification`
-- Product behavior, target users, platform, business model, functional scope, and success metrics are not yet specified in the repository.
+The first product scope is intentionally narrow:
 
-## Required product decisions
+- initial user: the repository owner;
+- initial delivery surface: Android;
+- first capability: a calendar-oriented view of financial items associated with dates;
+- the calendar experience must distinguish expected money entering from financial obligations leaving;
+- initial product data remains local to the device;
+- the initial experience does not require a backend, cloud synchronization, authentication, or user account;
+- Etar is a non-normative calendar UX/navigation reference only.
 
-Before implementation scope can be considered stable, the product owner should explicitly define:
-
-- target user or operator;
-- problem to be solved;
-- primary user outcome;
-- supported platform or runtime;
-- MVP capabilities;
-- explicit non-goals;
-- data handled by the product;
-- privacy, security, and compliance constraints;
-- measurable acceptance criteria;
-- release and operational constraints.
-
-Until those items are decided, agents must not infer them from the repository name or from implementation convenience.
+The product is not yet specified as a complete financial manager. Everything not explicitly approved remains **OPEN** or, where stated, **OUT OF SCOPE** for the first implementation phase.
 
 ## Files
 
-- `specification.md` — normative product-specification baseline and readiness gates.
+- `specification.md` — normative product decisions, functional requirements, acceptance criteria, open questions, and first-scope exclusions.
 
 ## Status vocabulary
 
-Use these labels consistently:
+- **DECIDED** — explicitly approved and safe to treat as current product authority.
+- **ASSUMPTION** — temporary working premise that requires confirmation; not equivalent to a decision.
+- **OPEN** — unresolved and not safe to infer.
+- **OUT OF SCOPE** — explicitly excluded from the current implementation scope without implying permanent rejection.
 
-- **DECIDED** — explicitly approved and safe to treat as a requirement.
-- **ASSUMPTION** — temporary working premise that requires confirmation.
-- **OPEN** — unresolved question that blocks or weakens downstream certainty.
-- **OUT OF SCOPE** — explicitly excluded from the current product scope.
+## Authority boundary
+
+Implementation scaffolding is evidence of technical choices, not product authority.
+
+Android has Product Owner authority under `P03-A02-002`. Desktop/JVM does not have product-delivery authority for the first implementation phase. Kotlin, Kotlin Multiplatform, Compose, Gradle, persistence technology, and other technical choices remain governed by engineering architecture and technical decision processes.
