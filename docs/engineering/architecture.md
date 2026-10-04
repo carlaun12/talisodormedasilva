@@ -1,248 +1,264 @@
 # Engineering Architecture Baseline
 
-Task: `P02-A03-001`  
-Phase: `P02 — Engineering Architecture`  
+Task: `P03-A03-002`  
 Owner: `A03 — Engineering Architecture and Technical Governance`  
-Status: Baseline  
-Last reviewed: 2026-10-03
+Status: Current baseline  
+Last reviewed: 2026-10-04
 
-## 1. Purpose
+## 1. Purpose and current scope
 
-This document defines the engineering architecture baseline for `talisodormedasilva`.
+This document describes the smallest engineering architecture justified by the currently approved product scope.
 
-At the time of this decision, `main` contains no product requirements, application code, deployment manifests, data model, API contract, or runtime selection. The architecture therefore establishes constraints and decision rules without inventing product-specific behavior.
+The current requirements are:
 
-The baseline is intended to keep implementation reversible until product requirements justify irreversible or high-cost choices.
+- one initial user: the repository owner;
+- Android as the only approved delivery surface;
+- one approved capability: a calendar-oriented financial view;
+- the view presents financial items by date, including obligations, credit-card-related obligations, and gains/income;
+- product data is local to the device;
+- no required backend/server;
+- no required authentication;
+- no required cloud synchronization;
+- Etar/LineageOS calendar is a UX/reference point only;
+- future capabilities and additional delivery surfaces remain undecided.
 
-## 2. Architectural posture
+The architecture must not expand beyond those requirements.
 
-The default posture is:
+ADR 0004 narrows the technology deferrals in ADR 0003 only where these requirements now provide sufficient evidence.
 
-1. **Single deployable before distributed topology.** Start with one deployable application boundary unless an ADR demonstrates a concrete need for independent scaling, fault isolation, release cadence, regulatory isolation, or ownership.
-2. **Explicit internal modules.** Business capabilities must be separated by module boundaries even when deployed together.
-3. **Dependency direction is inward.** Domain and application logic must not depend directly on delivery mechanisms, storage engines, external SDKs, or infrastructure frameworks.
-4. **External systems are adapters.** Databases, queues, third-party APIs, object stores, email/SMS providers, AI providers, and similar integrations are accessed through application-owned interfaces.
-5. **Configuration is externalized.** Environment-specific configuration and secrets must not be embedded in source code.
-6. **Observability is part of the design.** Logs, metrics, traces, correlation identifiers, and health signals are treated as operational interfaces.
-7. **Security boundaries are explicit.** Authentication, authorization, sensitive-data handling, and trust boundaries must be documented before production exposure.
-8. **Technology choices require evidence.** Runtime, framework, database, queue, cache, cloud, and deployment platform selections remain deferred until requirements make their trade-offs measurable.
+## 2. Selected foundation
 
-## 3. Logical architecture
+The active implementation foundation is:
 
-The system should be structured into the following logical layers. These are dependency rules, not mandated folder names.
+- one native Android application;
+- Kotlin;
+- Jetpack Compose for Android;
+- Gradle with the Android Gradle Plugin and Gradle Wrapper;
+- one initial Gradle module, `:app`;
+- Room over SQLite for structured local persistence.
 
-### 3.1 Domain
+The following are not part of the active foundation:
 
-Contains business concepts, invariants, policies, and domain services.
+- Desktop/JVM;
+- Kotlin Multiplatform;
+- Compose Multiplatform;
+- a shared multiplatform module;
+- backend or server infrastructure;
+- authentication;
+- networking;
+- cloud synchronization.
 
-Constraints:
+Exact tool and library versions remain implementation choices subject to compatibility validation. Architecture selects the technology families, not an unverified version matrix.
 
-- no dependency on HTTP, database, cloud, UI, or vendor SDKs;
-- deterministic business behavior where practical;
-- no hidden I/O inside domain logic;
-- invariants enforced close to the model that owns them.
+## 3. Architectural posture
 
-### 3.2 Application
+1. **One deployable Android application.** ADR 0002's single-deployable posture maps to one Android app for the current scope.
+2. **One physical module until another is justified.** Start with `:app`; use logical boundaries before multiplying Gradle modules.
+3. **Dependency direction remains inward.** UI and storage are adapters around application-owned concepts and contracts.
+4. **The calendar is presentation, not the domain.** Financial-date information is the underlying application concern; the calendar grid is one visualization of it.
+5. **No speculative financial platform.** Do not introduce budgets, reports, investments, bank integrations, card import, ledgers, accounts, sync, or multi-user architecture without product authority.
+6. **Local state is authoritative.** Persisted product data lives on the device; no network source of truth exists in the current architecture.
+7. **Technology boundaries stay reversible.** Android-specific frameworks should not leak into the minimal application/domain contracts when an owned contract is practical.
 
-Coordinates use cases and transaction boundaries.
+## 4. Minimum topology
+
+Use one Gradle module:
+
+```
+:app
+```
+
+Within that module, keep these logical boundaries. They are package/dependency boundaries, not mandated submodules:
+
+### Presentation
 
 Responsibilities:
 
-- orchestration of domain behavior;
-- authorization decisions that depend on use-case context;
-- application-level validation;
-- interfaces/ports for persistence and external services;
-- idempotency and concurrency policy where required.
+- Compose UI;
+- calendar/date presentation;
+- screen state;
+- user interaction events;
+- Android resource and lifecycle concerns.
 
-### 3.3 Adapters
+Presentation may depend on application/domain contracts. It must not query Room directly.
 
-Translate between the application and external mechanisms.
+### Application/domain
 
-Examples:
+Responsibilities:
 
-- HTTP/CLI/UI entry points;
-- persistence repositories;
-- message producers/consumers;
-- third-party API clients;
-- filesystem or object-storage adapters.
+- minimal financial-date concepts required by the approved view;
+- use-case/application coordination where behavior exists;
+- persistence contracts required by the current capability;
+- transformations that are independent of Android UI and Room.
 
-Adapters may depend on application-owned interfaces. Application and domain layers must not depend on adapter implementations.
+Do not create a broad financial-management model. If a rule or concept is not required for the approved financial calendar view, leave it undefined.
 
-### 3.4 Platform
+### Local data adapter
 
-Cross-cutting runtime concerns.
+Responsibilities:
 
-Examples:
+- Room database;
+- DAOs and persistence entities;
+- mapping between persisted records and application-owned types;
+- migrations.
 
-- configuration loading;
-- structured logging;
-- telemetry export;
-- secret resolution;
-- process lifecycle;
-- database connection management;
-- deployment wiring.
+Room-specific types must remain in this boundary.
 
-Platform code must not become a bypass around domain or application boundaries.
+### Platform wiring
 
-## 4. Module boundary rules
+Responsibilities:
 
-A module represents a business capability or cohesive technical responsibility.
+- Android application/activity entry point;
+- construction of concrete dependencies;
+- lifecycle integration required to connect presentation and data.
 
-Each module should expose a small public surface and keep implementation details private. Cross-module access must occur through explicit contracts rather than direct access to another module's persistence internals.
+A DI framework is not required. Manual construction is acceptable while the dependency graph remains small.
 
-The following are prohibited without an ADR:
+## 5. Dependency direction
 
-- shared mutable state across modules;
-- direct reads or writes to another module's tables as an integration mechanism;
-- circular module dependencies;
-- importing adapter implementations into domain logic;
-- background jobs that bypass the same application rules used by synchronous flows;
-- network distribution solely to mirror source-code module boundaries.
+Allowed direction:
 
-## 5. Data architecture baseline
+```
+Compose presentation
+        |
+        v
+application/domain contracts
+        ^
+        |
+Room local-data adapter
 
-No database technology is selected by this task.
+Android/platform wiring -> composes both sides
+```
 
-Until requirements exist, the following rules apply:
+Rules:
 
-- the application owns its schema and migrations;
-- data ownership follows module ownership;
-- migrations must be versioned and reproducible;
-- destructive migrations require an explicit rollout/backout strategy;
-- sensitive fields require classification before persistence;
-- retention and deletion behavior must be defined for regulated or user-owned data;
-- caches are non-authoritative unless an ADR explicitly states otherwise;
-- derived data must be reproducible or have a documented source-of-truth strategy.
+- Compose does not own financial business state;
+- Room entities do not become UI models;
+- application/domain code does not import Compose or Room;
+- persistence access is expressed through application-owned contracts;
+- no network abstraction is created until networking is an approved requirement;
+- avoid circular dependencies.
 
-## 6. Integration baseline
+## 6. Android application architecture
 
-No message broker, API style, or integration vendor is selected by this task.
+Use unidirectional data flow for the screen boundary:
 
-For any external integration:
+1. local persisted data is read through the data adapter;
+2. application/state-holder logic transforms it into immutable UI state;
+3. Compose renders that state;
+4. UI events flow back to the state holder/application boundary;
+5. approved mutations, when they exist, update the local source of truth.
 
-- define timeout behavior;
-- define retry policy and retryable failure classes;
-- prevent unbounded retries;
-- define idempotency expectations;
-- define rate-limit behavior;
-- propagate correlation identifiers where supported;
-- isolate vendor-specific models from domain models;
-- document fallback or degraded behavior when the dependency is unavailable.
+A screen-level Android `ViewModel` is appropriate when lifecycle-stable state ownership is needed, but the architecture does not require a separate ViewModel class for trivial state that does not justify one.
 
-Asynchronous messaging should be introduced only when it solves a documented requirement such as decoupled availability, buffering, fan-out, independent processing cadence, or workload smoothing.
+The Etar/LineageOS reference may inform calendar interaction and visual exploration. It does not authorize calendar-provider integration, event semantics, recurrence, reminders, invitations, synchronization, or other calendar-product behavior.
 
-## 7. API and contract governance
+## 7. Local persistence
 
-Public or cross-module contracts must be versioned deliberately.
+Room over SQLite is the selected persistence technology for current structured device-local product data.
 
-Breaking changes require one of:
+Rationale:
 
-- coordinated atomic release;
-- additive transition followed by deprecation;
-- explicit versioned contract.
+- the capability concerns a collection of structured financial items;
+- items are visualized by date, making indexed/range-oriented queries a natural requirement;
+- persisted local data requires schema evolution and migration discipline;
+- Room provides Android-native SQLite access with query verification and migration support.
 
-Contracts must define failure semantics, not only success payloads.
+Persistence constraints:
 
-Generated clients or schemas may be used, but generated artifacts must not become the source of business truth.
+- define only fields required by approved product behavior;
+- do not invent future account, ledger, budget, investment, reporting, import, or sync schemas;
+- version migrations from the first durable schema;
+- keep database and DAO representations private to the data adapter;
+- no cloud identifiers or synchronization metadata without a sync requirement;
+- do not store secrets because no authentication or backend exists in the current scope.
 
-## 8. Security architecture baseline
+## 8. Build and dependency governance
 
-Before any production exposure, the implementation must define:
+Use Gradle with the Android Gradle Plugin and the Gradle Wrapper.
 
-- trust boundaries and entry points;
-- identity source and authentication mechanism;
-- authorization model;
-- secret storage and rotation;
-- data classification;
-- encryption requirements in transit and at rest;
-- audit events for security-relevant actions;
-- dependency and supply-chain controls;
-- abuse/rate-limit strategy for public surfaces;
-- backup and restore responsibilities.
+Implementation must:
 
-Least privilege is the default for service credentials, database roles, deployment identities, and third-party tokens.
+- select mutually compatible stable Android, Kotlin, Compose, AGP, Gradle, Room, and SDK versions;
+- pin versions rather than use dynamic dependency versions;
+- keep the build Android-only;
+- avoid the Kotlin Multiplatform, Kotlin/JVM Desktop, and Compose Multiplatform plugins;
+- add dependencies only for a concrete current capability;
+- avoid introducing networking, authentication, analytics, serialization, DI, financial-calculation, or synchronization libraries without a requirement.
 
-## 9. Reliability and operability
+## 9. Testing baseline
 
-Every deployable component must eventually provide:
+Testing should cover the boundaries that now exist:
 
-- startup/readiness/liveness behavior appropriate to its runtime;
-- structured logs with timestamps and correlation identifiers;
-- actionable error classification;
-- operational metrics for traffic, errors, latency, and saturation where applicable;
-- graceful shutdown behavior;
-- documented backup/restore procedures for durable state;
-- deployment rollback or roll-forward strategy.
+- deterministic tests for application/domain transformations and date grouping where implemented;
+- persistence tests for Room queries and migrations once a schema exists;
+- Compose UI tests for the approved calendar-oriented view where behavior warrants them;
+- an Android application smoke test/build validation.
 
-Retries must use bounded attempts and backoff. A retry must never be used to hide an unknown failure mode.
+No test should imply unapproved financial behavior.
 
-## 10. Testing strategy
+## 10. Security and privacy scope
 
-Testing should follow risk rather than a fixed pyramid.
+The current application has:
 
-Minimum expectations:
+- one local user;
+- no authentication;
+- no backend;
+- no network requirement;
+- local financial information on the device.
 
-- domain invariants: fast deterministic tests;
-- application use cases: tests at module boundaries;
-- persistence/integration adapters: tests against realistic dependencies or contract-compatible substitutes;
-- external APIs: contract tests or recorded fixtures with drift controls;
-- critical user journeys: end-to-end tests once those journeys are defined.
+Therefore the current security boundary is primarily device-local data handling and dependency integrity.
 
-Tests must not depend on production secrets or production data.
+Do not add account, token, remote-secret, network transport, server authorization, or cloud-security architecture until those capabilities are approved.
 
-## 11. Delivery architecture
+If future requirements classify the financial information as needing additional at-rest protection beyond normal Android application sandboxing, that requires an explicit security decision.
 
-No CI/CD platform or hosting target is selected by this task.
+## 11. Delivery and operability
 
-The delivery design must eventually guarantee:
+The deliverable is an Android application artifact.
 
-- reproducible builds;
-- immutable release artifacts;
-- automated tests before promotion;
-- secret separation from build artifacts;
-- environment-specific configuration without source changes;
-- traceability from deployed artifact to source revision;
-- rollback or roll-forward procedure;
-- migration sequencing compatible with application rollout.
+The implementation foundation must support:
 
-## 12. Architecture fitness rules
+- reproducible builds through the Gradle Wrapper;
+- traceability from source revision to application build;
+- automated build/test validation when CI is introduced;
+- database migration testing after durable schema creation.
 
-The following conditions require an ADR before implementation:
+Server health checks, distributed tracing, network SLOs, queue monitoring, and service deployment concerns are not applicable to the current scope.
 
-- introducing a new deployable service;
-- introducing a new durable datastore technology;
-- introducing asynchronous messaging infrastructure;
-- changing the authentication or authorization model;
-- adding a new externally exposed API protocol;
-- adopting a new runtime/framework as a project-wide standard;
-- adding a cross-cutting vendor dependency;
-- creating a shared database across independently deployed components;
-- relaxing a security, availability, consistency, or audit requirement.
+## 12. Current decision state
 
-## 13. Current decision state
+Accepted in `P02-A03-001` and still applicable:
 
-Accepted in `P02-A03-001`:
+- architecture decisions are recorded as ADRs;
+- use one deployable before distributed topology;
+- maintain explicit dependency boundaries;
+- require evidence before adopting infrastructure or vendor dependencies.
 
-- architecture decisions will be captured as ADRs;
-- implementation begins from a modular, single-deployable posture;
-- distribution requires evidence rather than preference;
-- infrastructure and vendor details remain behind adapters;
-- technology-stack selection is deferred until product and operational requirements exist.
+Selected in `P03-A03-002` through ADR 0004:
 
-Deferred in `P02-A03-001`:
+- Android-only active delivery foundation;
+- Kotlin;
+- Jetpack Compose for Android;
+- Gradle/Android Gradle Plugin;
+- one initial `:app` module;
+- Room/SQLite local persistence;
+- unidirectional presentation state flow;
+- removal of Desktop/JVM, KMP, Compose Multiplatform, and the multiplatform `:shared` module from the active foundation.
 
-- programming language and runtime;
-- application framework;
-- frontend architecture;
-- relational vs non-relational persistence;
-- database product;
-- queue/broker technology;
-- cache technology;
-- hosting/cloud platform;
-- container/orchestrator choice;
-- CI/CD vendor;
-- authentication provider;
+Still deferred:
+
+- backend/server technology;
+- networking framework;
+- authentication;
+- synchronization;
+- cloud provider;
+- analytics;
 - observability vendor;
-- concrete SLOs and capacity targets.
+- DI framework;
+- serialization framework;
+- financial calculation libraries;
+- any second delivery surface;
+- broader product-domain modeling.
 
-These deferrals are intentional. Selecting them without requirements would create arbitrary constraints rather than architecture.
+These deferrals are intentional and should remain unresolved until requirements exist.
