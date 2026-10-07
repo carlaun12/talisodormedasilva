@@ -47,8 +47,8 @@ class CalendarScreenTest {
 
     @Test fun emptyDatabaseHasExplicitEmptyState() {
         show(CalendarState(YearMonth.from(date), date, isLoading = false))
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nothing due today"))
-        compose.onNodeWithText("Nothing due today").assertExists()
+        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nothing on this date"))
+        compose.onNodeWithText("Nothing on this date").assertExists()
         compose.onNodeWithText("No financial items on this date.").assertExists()
     }
 
