@@ -35,8 +35,8 @@ class CalendarScreenTest {
         )
         show(CalendarState(YearMonth.from(date), date, mapOf(date to fixture), isLoading = false))
         compose.onNodeWithTag("day-$date").assertIsSelected()
-        compose.onNodeWithText("In: 1").assertExists()
-        compose.onNodeWithText("Out: 1").assertExists()
+        compose.onNodeWithTag("month-summary").assertExists()
+        compose.onNodeWithText("1 items").assertExists()
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Expected inflow"))
         compose.onNodeWithText("Expected inflow").assertExists()
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Obligation / expected outflow"))
@@ -45,7 +45,8 @@ class CalendarScreenTest {
 
     @Test fun emptyDatabaseHasExplicitEmptyState() {
         show(CalendarState(YearMonth.from(date), date, isLoading = false))
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("No financial items on this date."))
+        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nothing due today"))
+        compose.onNodeWithText("Nothing due today").assertExists()
         compose.onNodeWithText("No financial items on this date.").assertExists()
     }
 
