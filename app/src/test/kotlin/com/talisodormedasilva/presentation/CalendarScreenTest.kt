@@ -1,6 +1,8 @@
 package com.talisodormedasilva.presentation
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -35,8 +37,8 @@ class CalendarScreenTest {
         )
         show(CalendarState(YearMonth.from(date), date, mapOf(date to fixture), isLoading = false))
         compose.onNodeWithTag("day-$date").assertIsSelected()
-        compose.onNodeWithText("In: 1").assertExists()
-        compose.onNodeWithText("Out: 1").assertExists()
+        compose.onNodeWithTag("month-summary").assertExists()
+        compose.onAllNodesWithText("1 items").assertCountEquals(2)
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Expected inflow"))
         compose.onNodeWithText("Expected inflow").assertExists()
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Obligation / expected outflow"))
@@ -45,7 +47,8 @@ class CalendarScreenTest {
 
     @Test fun emptyDatabaseHasExplicitEmptyState() {
         show(CalendarState(YearMonth.from(date), date, isLoading = false))
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("No financial items on this date."))
+        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nothing on this date"))
+        compose.onNodeWithText("Nothing on this date").assertExists()
         compose.onNodeWithText("No financial items on this date.").assertExists()
     }
 

@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">talisodormedasilva</string>
     <string name="calendar_title">Financial calendar</string>
+    <string name="month_financial_summary">Your financial month · %1$d</string>
+    <string name="incoming">Incoming</string>
+    <string name="outgoing">Outgoing</string>
+    <string name="item_count">%1$d items</string>
     <string name="previous_month">Previous month</string>
     <string name="next_month">Next month</string>
     <string name="expected_inflow">Expected inflow</string>
@@ -8,6 +12,7 @@
     <string name="inflow_count">In: %1$d</string>
     <string name="outflow_count">Out: %1$d</string>
     <string name="date_summary">%1$s. Expected inflows: %2$d. Obligations: %3$d.</string>
+    <string name="empty_day_title">Nothing on this date</string>
     <string name="empty_day">No financial items on this date.</string>
     <string name="loading">Loading local financial items…</string>
     <string name="load_error">Local financial items could not be loaded.</string>

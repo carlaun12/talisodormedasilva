@@ -18,7 +18,8 @@ class CalendarSmokeTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun cleanInstallShowsCalendarAndEmptyLocalDatabase() {
-        compose.onNodeWithText("Financial calendar").assertExists()
+        compose.onNodeWithTag("month-title").assertExists()
+        compose.onNodeWithTag("month-summary").assertExists()
         compose.waitUntil(timeoutMillis = 10_000) {
             !ViewModelProvider(compose.activity)[CalendarViewModel::class.java].state.value.isLoading
         }
