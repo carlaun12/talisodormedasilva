@@ -6,7 +6,6 @@ on:
       - main
   push:
     branches:
-      - build/p03-a01-002-android-foundation
       - main
   workflow_dispatch:
 
