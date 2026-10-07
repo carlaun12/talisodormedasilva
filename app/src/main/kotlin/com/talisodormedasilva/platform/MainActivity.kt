@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.talisodormedasilva.presentation.CalendarScreen
+import com.talisodormedasilva.presentation.CalendarTheme
 import com.talisodormedasilva.presentation.CalendarViewModel
 
 class MainActivity : ComponentActivity() {
@@ -25,8 +26,8 @@ class MainActivity : ComponentActivity() {
             val model: CalendarViewModel = viewModel(factory = viewModelFactory {
                 initializer { CalendarViewModel(repository, createSavedStateHandle()) }
             })
-            MaterialTheme {
-                Scaffold { padding ->
+            CalendarTheme {
+                Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
                     CalendarScreen(
                         state = model.state.collectAsStateWithLifecycle().value,
                         onPreviousMonth = model::previousMonth,
