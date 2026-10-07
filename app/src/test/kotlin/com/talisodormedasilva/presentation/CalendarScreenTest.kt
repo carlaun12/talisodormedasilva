@@ -1,6 +1,8 @@
 package com.talisodormedasilva.presentation
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -36,7 +38,7 @@ class CalendarScreenTest {
         show(CalendarState(YearMonth.from(date), date, mapOf(date to fixture), isLoading = false))
         compose.onNodeWithTag("day-$date").assertIsSelected()
         compose.onNodeWithTag("month-summary").assertExists()
-        compose.onNodeWithText("1 items").assertExists()
+        compose.onAllNodesWithText("1 items").assertCountEquals(2)
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Expected inflow"))
         compose.onNodeWithText("Expected inflow").assertExists()
         compose.onNodeWithTag("calendar").performScrollToNode(hasText("Obligation / expected outflow"))
