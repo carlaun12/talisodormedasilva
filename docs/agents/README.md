@@ -1,7 +1,8 @@
 # AI Agent Governance
 
 Governance baseline: `P02-A02-001`  
-Current product-decision update: `P03-A02-002`
+Initial product-decision update: `P03-A02-002`  
+Current product-decision update: `P03-A02-003`
 
 This directory defines how AI agents operate on the repository and records task-specific governance/decision handoffs.
 
@@ -22,9 +23,11 @@ An agent is not authorized by capability alone. Authorization comes from the act
 7. Validate the final diff against the task scope before handoff.
 8. Record unresolved blockers instead of concealing them.
 9. A technical implementation cannot grant itself product authority.
+10. When a later Product Owner decision narrows or supersedes an earlier ambiguity, preserve the earlier record and add explicit forward traceability rather than rewriting history.
 
 ## Files
 
 - `governance.md` — repository-level agent execution protocol.
 - `A02-P02-A02-001.md` — initial Product Specification and Agent Governance baseline.
 - `A02-P03-A02-002.md` — Product Owner decision record establishing the narrow initial Android calendar scope.
+- `A02-P03-A02-003.md` — Product Owner decision record establishing Android API 35 as the support floor and current-device-only financial data without backup/transfer.

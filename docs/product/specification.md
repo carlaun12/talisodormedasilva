@@ -1,6 +1,7 @@
 # Product Specification
 
-Product authority updated by: `P03-A02-002`  
+Product authority updated by: `P03-A02-003`  
+Previous product decision update: `P03-A02-002`  
 Prior baseline: `P02-A02-001`  
 Status: **PARTIALLY SPECIFIED — initial Android calendar capability authorized; broader product remains OPEN**
 
@@ -10,7 +11,7 @@ This document records only product decisions explicitly authorized by the Produc
 
 - **DECIDED** — explicitly approved and safe to treat as current product authority.
 - **OPEN** — not yet decided; implementation must not infer a requirement.
-- **OUT OF SCOPE** — explicitly excluded from the first implementation phase, without implying permanent rejection.
+- **OUT OF SCOPE** — explicitly excluded from the current implementation phase, without implying permanent rejection.
 
 ## 2. Product identity
 
@@ -20,7 +21,7 @@ This document records only product decisions explicitly authorized by the Produc
 
 No additional product meaning is inferred from the identifier.
 
-Traceability: prior baseline `P02-A02-001`; retained by `P03-A02-002`.
+Traceability: prior baseline `P02-A02-001`; retained by `P03-A02-002` and `P03-A02-003`.
 
 ## 3. Product Owner decision register
 
@@ -89,9 +90,48 @@ For the initial product:
 
 This is an initial-scope decision, not a permanent architectural prohibition. Remote services, synchronization, accounts, and related infrastructure remain **OPEN** for future decisions.
 
-Persistence technology, database choice, schema, and exact data lifecycle remain **OPEN** technical/product-detail decisions.
+Persistence technology, database choice, schema, and exact data lifecycle remain separate technical/product-detail decisions.
 
 Source: Product Owner decision supplied in task `P03-A02-002`.
+
+**Current clarification:** `PD-007` further narrows the current-device data boundary by explicitly disabling Android cloud backup, device-to-device application-data transfer, backend/server persistence, cloud synchronization, and account-based remote restore for product financial data.
+
+### PD-006 — Android support floor
+
+**DECIDED**
+
+The minimum supported Android version for the current product is **Android 15 / API 35**.
+
+Consequences for the current product:
+
+- Android versions below API 35 are **OUT OF SCOPE**;
+- supporting older Android versions is not currently a requirement;
+- the technical implementation must use `minSdk = 35`;
+- any earlier ambiguity suggesting API 23 or another lower compatibility floor is superseded by this Product Owner decision.
+
+This is the current support floor, not a permanent lifetime commitment. A future Product Owner decision may change it.
+
+Source: Product Owner decision supplied in task `P03-A02-003`.
+
+### PD-007 — Current-device-only financial data
+
+**DECIDED**
+
+Product financial data must remain only on the current local device.
+
+For the current product, all of the following are disabled and are not requirements:
+
+- Android cloud backup;
+- device-to-device application data transfer;
+- cloud synchronization;
+- backend/server persistence;
+- account-based remote restore.
+
+No remote copy, backup infrastructure, synchronization mechanism, account-backed restore path, or cross-device migration mechanism should be inferred from the product scope.
+
+This is a current product decision, not necessarily a permanent lifetime prohibition. A future Product Owner decision may change the locality/backup/transfer policy.
+
+Source: Product Owner decision supplied in task `P03-A02-003`.
 
 ## 4. Initial user problem and primary outcome
 
@@ -119,7 +159,7 @@ Traceability: `PD-003`; task `P03-A02-002`.
 
 The repository does not yet define the product as a complete financial manager, budgeting tool, accounting system, investment product, banking product, or other broader category.
 
-## 5. Initial functional requirements
+## 5. Initial functional and support requirements
 
 ### FR-001 — Calendar-oriented Android experience
 
@@ -167,6 +207,30 @@ Acceptance: see `AC-004`.
 
 Source: `PD-005`; task `P03-A02-002`.
 
+### FR-005 — Android 15 / API 35 support floor
+
+**DECIDED**
+
+The current product supports Android 15 / API 35 and newer. Android versions below API 35 are outside the current product support scope.
+
+The Android implementation configuration must reflect this product support floor with `minSdk = 35`.
+
+Acceptance: see `AC-005`.
+
+Source: `PD-006`; task `P03-A02-003`.
+
+### FR-006 — Current-device-only financial data boundary
+
+**DECIDED**
+
+Product financial data shall remain only on the current local device. The current product shall not rely on or enable Android cloud backup, device-to-device application-data transfer, cloud synchronization, backend/server persistence, or account-based remote restore for that data.
+
+This requirement does not select the local persistence implementation.
+
+Acceptance: see `AC-006`.
+
+Source: `PD-007`; task `P03-A02-003`.
+
 ## 6. Product-level acceptance criteria
 
 ### AC-001
@@ -185,9 +249,20 @@ The experience can distinguish money expected to enter from financial obligation
 
 The demonstrated experience works without requiring a remote server or user account.
 
-These criteria are product-level boundaries. They do not prescribe framework, language, database, storage engine, build system, or software architecture.
+### AC-005
 
-Traceability for `AC-001` through `AC-004`: task `P03-A02-002`, decisions `PD-002`, `PD-003`, and `PD-005`.
+The current product declares Android 15 / API 35 as its minimum supported Android version, with Android versions below API 35 outside the supported product scope.
+
+### AC-006
+
+Product financial data remains confined to the current local device: the product does not provide or depend on Android cloud backup, device-to-device application-data transfer, cloud synchronization, backend/server persistence, or account-based remote restore for that data.
+
+These criteria are product-level boundaries. Except where the Product Owner explicitly selected `minSdk = 35` as the required Android support-floor configuration, they do not prescribe framework, language, database, storage engine, build system, or software architecture.
+
+Traceability:
+- `AC-001` through `AC-004`: task `P03-A02-002`, decisions `PD-002`, `PD-003`, and `PD-005`;
+- `AC-005`: task `P03-A02-003`, decision `PD-006`;
+- `AC-006`: task `P03-A02-003`, decision `PD-007`.
 
 ## 7. Data and integrations
 
@@ -195,9 +270,20 @@ Traceability for `AC-001` through `AC-004`: task `P03-A02-002`, decisions `PD-00
 
 **DECIDED**
 
-Data used by the initial product is local to the device. The initial scope does not require backend services, cloud synchronization, or authentication/account infrastructure.
+Product financial data is current-device-only.
 
-Traceability: `PD-005`; task `P03-A02-002`.
+For the current product:
+
+- local device storage is the only approved location for product financial data;
+- Android cloud backup is disabled;
+- device-to-device application data transfer is disabled;
+- cloud synchronization is disabled;
+- backend/server persistence is disabled;
+- account-based remote restore is disabled.
+
+This supersedes the prior OPEN status of backup/recovery expectations insofar as they concern remote backup, remote restore, or cross-device transfer for the current product.
+
+Traceability: `PD-005`, `PD-007`; tasks `P03-A02-002` and `P03-A02-003`.
 
 ### Data details
 
@@ -210,12 +296,11 @@ The following remain undecided:
 - installment model;
 - recurrence behavior;
 - transaction or obligation status model;
-- persistence technology;
-- database or storage schema;
-- retention/deletion behavior beyond the current local-only boundary;
+- local database or storage schema;
+- retention/deletion behavior on the current device;
 - financial calculations;
 - monthly summaries or derived aggregates;
-- import/export behavior.
+- import/export behavior other than the explicitly disabled remote backup/restore and device-transfer paths.
 
 No implementation choice may be promoted to product authority for these items without a later decision.
 
@@ -247,13 +332,19 @@ The following remain undecided:
 - accessibility targets beyond any platform baseline later adopted;
 - which, if any, Etar interaction patterns should be reproduced.
 
-## 9. Explicitly out of scope for the first implementation phase
+## 9. Explicitly out of scope for the current implementation phase
 
 **OUT OF SCOPE**
 
-Unless separately approved by a later Product Owner decision, the first implementation phase does not include:
+Unless separately approved by a later Product Owner decision, the current implementation phase does not include:
 
+- Android versions below API 35;
 - Desktop/JVM as a product delivery surface;
+- Android cloud backup for product financial data;
+- device-to-device application data transfer for product financial data;
+- cloud synchronization;
+- backend/server persistence;
+- account-based remote restore;
 - budgeting;
 - categories;
 - investment tracking;
@@ -267,14 +358,14 @@ Unless separately approved by a later Product Owner decision, the first implemen
 - notifications;
 - automation;
 - account synchronization;
-- cloud synchronization;
 - financial advice;
-- backend services;
 - authentication or account infrastructure.
 
-These exclusions limit the first implementation phase only. They are not permanent product rejections.
+These exclusions limit the current implementation phase only. They are not permanent product rejections.
 
-Traceability: `PD-002`, `PD-003`, `PD-005`; task `P03-A02-002`.
+Traceability:
+- `PD-002`, `PD-003`, `PD-005`; task `P03-A02-002`;
+- `PD-006`, `PD-007`; task `P03-A02-003`.
 
 ## 10. Still-open product questions
 
@@ -285,44 +376,47 @@ Everything not explicitly decided above remains unresolved. Material open areas 
 - broader future product direction;
 - whether the product will ever target users other than the repository owner;
 - future delivery surfaces beyond Android;
+- whether a future Product Owner decision should support Android versions below API 35;
 - detailed creation, editing, deletion, and lifecycle behavior for financial items;
 - exact treatment of credit-card obligations and installments;
 - recurrence;
 - categories or other classification;
 - financial calculations and summaries;
-- reporting, dashboard, notification, automation, import, integration, and synchronization capabilities;
-- future remote services;
+- reporting, dashboard, notification, automation, import, integration, and synchronization capabilities not currently approved;
+- whether future remote services, backup, restore, transfer, or synchronization should ever be introduced;
 - future authentication/account model;
-- data-retention and backup expectations;
-- security/privacy requirements beyond the current local-only/no-account boundary;
+- on-device retention and deletion expectations;
+- security/privacy requirements beyond the current-device-only/no-account boundary;
 - success metrics beyond satisfying the initial acceptance criteria;
 - release/distribution policy.
 
 Open items must not be filled by inference from implementation scaffolding or from the Etar reference.
 
-## 11. Relationship to technical scaffolding
-
-PR #3 and any Kotlin/Multiplatform/Compose/Gradle scaffolding are technical evidence only.
+## 11. Relationship to technical architecture
 
 Current product authority is:
 
 - Android: **DECIDED** as the initial delivery surface;
-- Desktop/JVM: not approved for the first product scope;
-- Kotlin/Kotlin Multiplatform/Compose/Gradle: not product decisions.
+- Android 15 / API 35: **DECIDED** as the minimum supported Android version;
+- `minSdk = 35`: required to reflect the selected support floor;
+- Desktop/JVM: not approved for the current product scope;
+- product financial data: current-device-only, with Android cloud backup and device transfer disabled;
+- cloud synchronization, backend/server persistence, and account-based remote restore: disabled for the current product.
 
-Engineering architecture and technical governance remain responsible for deciding whether any technical scaffold is acceptable under the product constraints now recorded.
+Technology-family decisions such as Kotlin, Jetpack Compose, Gradle/AGP, and Room are governed by engineering architecture and ADRs. Product decisions in `P03-A02-003` constrain those technical choices but do not otherwise redesign the architecture.
 
-Traceability: task `P03-A02-002`.
+Traceability: tasks `P03-A02-002` and `P03-A02-003`.
 
 ## 12. Implementation authorization boundary
 
-The repository now has sufficient product authority to evaluate an **Android-only technical foundation** for the narrow first capability defined by `FR-001` through `FR-004`.
+The repository has sufficient product authority to implement and evaluate the narrow Android calendar capability defined by `FR-001` through `FR-006`, subject to the current architecture authority.
 
 This does not authorize:
 
 - a complete product implementation beyond those requirements;
+- Android support below API 35;
 - Desktop/JVM product delivery;
-- additional financial-management features;
-- a specific language, framework, multiplatform strategy, persistence technology, or architecture.
+- remote backup, cross-device transfer, cloud synchronization, backend persistence, or account-based remote restore of product financial data;
+- additional financial-management features not explicitly approved.
 
 Any broader implementation remains blocked on later Product Owner and/or architecture decisions, as applicable.
