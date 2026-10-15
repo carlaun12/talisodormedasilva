@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - build/p03-a01-002-android-foundation
   push:
     branches:
       - main
@@ -13,12 +14,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-ci-${{ github.workflow }}-${{ github.ref }}
+  group: android-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build, test and package APK
+    name: Build, test, lint and package APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -47,8 +48,8 @@ jobs:
       - name: Ensure Gradle Wrapper is executable
         run: chmod +x ./gradlew
 
-      - name: Build, test and lint
-        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+      - name: Build APK, test and lint
+        run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleDebugAndroidTest
 
       - name: Upload debug APK
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
