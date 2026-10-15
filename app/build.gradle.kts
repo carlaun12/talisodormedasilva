@@ -13,7 +13,7 @@ android {
     buildToolsVersion = "36.0.0"
     defaultConfig {
         applicationId = "com.talisodormedasilva"
-        minSdk = 23
+        minSdk = 35
         targetSdk = 36
         versionCode = 1
         versionName = "0.1"

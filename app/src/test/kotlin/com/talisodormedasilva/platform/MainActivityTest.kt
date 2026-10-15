@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.LooperMode
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], qualifiers = "en-rUS")
+@Config(sdk = [35], qualifiers = "en-rUS")
 @LooperMode(LooperMode.Mode.PAUSED)
 class MainActivityTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
