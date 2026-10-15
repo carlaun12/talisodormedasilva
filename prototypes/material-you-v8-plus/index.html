@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff8ff">
+<title>Material You v8+ — Calendário financeiro</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#211d25;background:#fff8ff;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}.app{max-width:430px;min-height:100dvh;margin:auto;display:flex;flex-direction:column;background:#fff8ff;position:relative;overflow:hidden}
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:14px;font-weight:600;color:#1d1a22}.system-icons{font-size:12px;display:flex;align-items:center;gap:8px}.battery{width:24px;height:12px;border:1.5px solid #1d1a22;border-radius:3px;position:relative}.battery:after{content:"";position:absolute;inset:2px;background:#1d1a22;border-radius:1px}
+.accent{position:absolute;top:44px;left:-24px;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 58% 45%,#eed6f2,#cba7dc 62%,#b7a1d1);opacity:.6;pointer-events:none}
+main{flex:1;padding:106px 16px 22px;display:flex;flex-direction:column;gap:12px;z-index:1}
+header h1{margin:0;color:#2a1d2e;font-size:34px;line-height:1.08;letter-spacing:-1.2px}header p{margin:6px 0 0;color:#7b6c80;font-size:14px;line-height:1.4}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 0}.metric{height:88px;padding:14px 16px;border-radius:24px;display:flex;flex-direction:column;gap:3px}.metric.due{background:#f2d9e7}.metric.incoming{background:#ddead7}.metric small{font-size:11px;color:#68596d}.metric strong{font-size:18px;color:#2b222e;font-weight:600}.metric span{font-size:10px;color:#7b6d80}
+.month-switch{height:52px;border-radius:16px;box-shadow:0 6px 18px #1f142e14;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:6px 8px}.month-switch strong{font-size:16px;font-weight:600}.month-switch button{border:0;border-radius:12px;background:#f5f0fb;color:#5a3d86;width:40px;height:40px;font-size:26px;cursor:pointer}
+.calendar{padding:18px 14px;border-radius:30px;background:#f3e6f5}.weekdays,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));justify-items:center}.weekdays{margin-bottom:12px}.weekdays span{height:24px;display:grid;place-items:center;color:#8a788e;font-weight:600;font-size:11px}.days{row-gap:8px}.day{width:min(36px,100%);height:36px;border:0;border-radius:12px;background:transparent;font:500 14px Inter,system-ui,sans-serif;color:#2d2833;cursor:pointer}.day.selected{background:#6e4aa1;color:white;font-weight:600}.day:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b4a0d8;outline-offset:2px}.day:disabled{cursor:default}
+.selected-day{display:flex;flex-direction:column;gap:12px}.selected-heading{display:flex;gap:8px;justify-content:space-between;align-items:center}.selected-heading strong{font-size:16px;font-weight:600}.weekday-pill{background:#f1ebf8;color:#6e4aa1;border-radius:99px;padding:5px 10px;font-size:11px;white-space:nowrap}.empty{background:#f7f4fa;border-radius:16px;padding:18px}.empty strong{font-size:15px;font-weight:600}.empty p{font-size:13px;color:#746e7c;line-height:1.45;margin:8px 0 0}.records{display:grid;gap:8px}.record{background:#f7f4fa;border-radius:16px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.record span{display:block;font-size:12px;color:#746e7c;margin-top:5px}
+.add{border:0;border-radius:16px;background:#17141b;color:#fff;height:52px;width:100%;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}.add span{font-size:22px;font-weight:400}
+.home{height:26px;display:grid;place-items:center;margin-top:auto}.home::after{content:"";width:140px;height:5px;background:#19171bbf;border-radius:99px}
+.scrim{position:fixed;inset:0;background:#1b162b7a;z-index:9}.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,430px);background:#fff8ff;border-radius:28px 28px 0 0;padding:12px 24px max(28px,env(safe-area-inset-bottom));z-index:10;box-shadow:0 -12px 30px #211d2520}.handle{width:32px;height:4px;background:#cdc2d3;border-radius:99px;margin:0 auto 22px}.sheet h2{font-size:24px;line-height:1.2;margin:0 0 18px}.sheet form{display:grid;gap:14px}.field{display:grid;gap:6px;font-size:13px;font-weight:600;color:#68596d}.field input,.field select{width:100%;height:48px;border:1px solid #d7cadc;border-radius:12px;padding:0 12px;background:white;color:#211d25;font:inherit}.sheet-actions{display:flex;gap:10px;margin-top:8px}.sheet-actions button{height:48px;border-radius:14px;border:0;cursor:pointer;font-weight:600;flex:1}.cancel{background:#eee6f2;color:#5a3d86}.save{background:#6e4aa1;color:white}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}[hidden]{display:none!important}@media(max-width:350px){.selected-heading strong{font-size:13px}.metric{padding:14px 11px}.weekday-pill{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="status"><span>22:56</span><div class="system-icons" aria-label="Indicadores do sistema"><span>●●●</span><span>⌁</span><span class="battery"></span></div></div>
+ <div class="accent" aria-hidden="true"></div>
+ <main>
+  <header><h1 id="heading">Fevereiro</h1><p id="subtitle">Seu mês financeiro · 2028</p></header>
+  <div class="summary" aria-label="Resumo mensal"><div class="metric due"><small>A pagar</small><strong id="total-due">R$ 1.240</strong><span id="due-count">3 compromissos</span></div><div class="metric incoming"><small>A receber</small><strong id="total-incoming">R$ 3.680</strong><span id="incoming-count">2 entradas</span></div></div>
+  <nav class="month-switch" aria-label="Navegar pelos meses"><button id="previous" type="button" aria-label="Mês anterior">‹</button><strong id="month-name">Fevereiro 2028</strong><button id="next" type="button" aria-label="Próximo mês">›</button></nav>
+  <section class="calendar" aria-label="Calendário financeiro"><div class="weekdays" aria-hidden="true"><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span></div><div id="days" class="days"></div></section>
+  <section class="selected-day" aria-live="polite"><div class="selected-heading"><strong id="date-heading"></strong><span id="weekday" class="weekday-pill"></span></div><div id="day-content"></div></section>
+  <button class="add" type="button" id="open-sheet"><span aria-hidden="true">+</span> Adicionar item financeiro</button>
+ </main><div class="home" aria-hidden="true"></div>
+</div>
+<div id="scrim" class="scrim" hidden></div>
+<section id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+ <div class="handle" aria-hidden="true"></div><h2 id="sheet-title">Novo item financeiro</h2>
+ <form id="entry-form">
+  <label class="field">Descrição<input id="description" name="description" required maxlength="90" placeholder="Ex.: Aluguel"></label>
+  <label class="field">Tipo<select id="kind" name="kind"><option value="due">A pagar</option><option value="incoming">A receber</option></select></label>
+  <label class="field">Valor (R$)<input id="amount" name="amount" type="number" min="0.01" step="0.01" required placeholder="0,00"></label>
+  <label class="field">Data<input id="entry-date" name="date" type="date" required></label>
+  <div class="sheet-actions"><button type="button" class="cancel" id="close-sheet">Cancelar</button><button type="submit" class="save">Salvar</button></div>
+ </form>
+</section>
+<script>
+(()=>{'use strict';
+const monthFmt=new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'});
+const monthOnly=new Intl.DateTimeFormat('pt-BR',{month:'long'});
+const weekdayFmt=new Intl.DateTimeFormat('pt-BR',{weekday:'long'});
+const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:2});
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const initial=[{date:'2028-02-02',description:'Conta de luz',kind:'due',amount:240},{date:'2028-02-09',description:'Aluguel',kind:'due',amount:800},{date:'2028-02-24',description:'Internet',kind:'due',amount:200},{date:'2028-02-08',description:'Pagamento de cliente',kind:'incoming',amount:1680},{date:'2028-02-21',description:'Projeto freelance',kind:'incoming',amount:2000}];
+let items;try{const saved=JSON.parse(localStorage.getItem('talisodormedasilva:v8:items'));items=Array.isArray(saved)?saved:initial}catch{items=initial.slice()}
+let month=new Date(2028,1,1),selected=new Date(2028,1,15),lastFocus=null;
+const label=d=>monthOnly.format(d).replace(/^./,c=>c.toUpperCase());
+function render(){const y=month.getFullYear(),m=month.getMonth(),title=label(month);
+$('heading').textContent=title;$('subtitle').textContent='Seu mês financeiro · '+y;$('month-name').textContent=title+' '+y;
+const monthly=items.filter(i=>i.date.startsWith(y+'-'+pad(m+1)+'-'));for(const [kind,totalId,countId,singular,plural] of [['due','total-due','due-count','compromisso','compromissos'],['incoming','total-incoming','incoming-count','entrada','entradas']]){const list=monthly.filter(i=>i.kind===kind);$(''+totalId).textContent=money.format(list.reduce((s,i)=>s+Number(i.amount),0));$(countId).textContent=list.length+' '+(list.length===1?singular:plural)}
+const grid=$('days');grid.replaceChildren();const first=(new Date(y,m,1).getDay()+6)%7;const length=new Date(y,m+1,0).getDate();const count=Math.ceil((first+length)/7)*7;
+for(let i=0;i<count;i++){const n=i-first+1,button=document.createElement('button');button.className='day';button.type='button';if(n<1||n>length){button.disabled=true;button.setAttribute('aria-hidden','true')}else{const d=new Date(y,m,n);button.textContent=n;button.setAttribute('aria-label',new Intl.DateTimeFormat('pt-BR',{dateStyle:'full'}).format(d));const chosen=key(d)===key(selected);if(chosen){button.classList.add('selected');button.setAttribute('aria-pressed','true')}else button.setAttribute('aria-pressed','false');button.addEventListener('click',()=>{selected=d;render()})}grid.appendChild(button)}
+$('date-heading').textContent=new Intl.DateTimeFormat('pt-BR',{day:'numeric',month:'long',year:'numeric'}).format(selected);$('weekday').textContent=weekdayFmt.format(selected).replace(/^./,c=>c.toUpperCase());
+const list=items.filter(i=>i.date===key(selected)),target=$('day-content');target.replaceChildren();if(!list.length){const box=document.createElement('div');box.className='empty';const heading=document.createElement('strong');heading.textContent='Nenhum lançamento neste dia';const desc=document.createElement('p');desc.textContent='Você não tem contas, recebimentos ou eventos financeiros agendados.';box.append(heading,desc);target.appendChild(box)}else{const holder=document.createElement('div');holder.className='records';for(const item of list){const row=document.createElement('article');row.className='record';const left=document.createElement('div');const name=document.createElement('strong');name.textContent=item.description;const type=document.createElement('span');type.textContent=item.kind==='due'?'A pagar':'A receber';left.append(name,type);const value=document.createElement('strong');value.textContent=money.format(item.amount);row.append(left,value);holder.appendChild(row)}target.appendChild(holder)}}
+function shift(n){month=new Date(month.getFullYear(),month.getMonth()+n,1);selected=new Date(month.getFullYear(),month.getMonth(),Math.min(selected.getDate(),new Date(month.getFullYear(),month.getMonth()+1,0).getDate()));render()}
+function close(){ $('sheet').hidden=true;$('scrim').hidden=true;document.body.style.overflow='';lastFocus?.focus()}
+function open(){lastFocus=document.activeElement;$('entry-date').value=key(selected);$('sheet').hidden=false;$('scrim').hidden=false;document.body.style.overflow='hidden';$('description').focus()}
+$('previous').addEventListener('click',()=>shift(-1));$('next').addEventListener('click',()=>shift(1));$('open-sheet').addEventListener('click',open);$('close-sheet').addEventListener('click',close);$('scrim').addEventListener('click',close);
+document.addEventListener('keydown',e=>{if($('sheet').hidden)return;if(e.key==='Escape'){close();return}if(e.key==='Tab'){const controls=[...$('sheet').querySelectorAll('input,select,button')];const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
+$('entry-form').addEventListener('submit',e=>{e.preventDefault();const data=new FormData(e.currentTarget);const amount=Number(data.get('amount')),date=String(data.get('date'));if(!Number.isFinite(amount)||amount<=0||!/^\d{4}-\d{2}-\d{2}$/.test(date))return;const [y,m,d]=date.split('-').map(Number);const parsed=new Date(y,m-1,d);if(key(parsed)!==date)return;items.push({date,description:String(data.get('description')).trim(),kind:data.get('kind')==='incoming'?'incoming':'due',amount});try{localStorage.setItem('talisodormedasilva:v8:items',JSON.stringify(items))}catch{}selected=parsed;month=new Date(y,m-1,1);e.currentTarget.reset();close();render()});
+render();
+})();
+</script>
+</body></html>
