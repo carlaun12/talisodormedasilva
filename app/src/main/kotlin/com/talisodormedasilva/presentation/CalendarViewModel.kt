@@ -3,10 +3,13 @@ package com.talisodormedasilva.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.talisodormedasilva.domain.FinancialItem
+import com.talisodormedasilva.domain.FinancialDirection
 import com.talisodormedasilva.domain.FinancialItemRepository
 import com.talisodormedasilva.domain.groupItemsByDate
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,6 +33,33 @@ class CalendarViewModel(
         if (YearMonth.from(date) != state.value.month) return
         savedState["selectedDate"] = date.toString()
         mutableState.update { it.copy(selectedDate = date) }
+    }
+
+    fun openAddItem() { mutableState.update { it.copy(isAdding = true, saveError = false) } }
+
+    fun closeAddItem() {
+        if (!state.value.isSaving) mutableState.update { it.copy(isAdding = false, saveError = false) }
+    }
+
+    fun addItem(label: String, direction: FinancialDirection, amountCents: Long, date: LocalDate) {
+        if (state.value.isSaving || label.isBlank() || label.trim().length > 90 || amountCents <= 0) return
+        mutableState.update { it.copy(isSaving = true, saveError = false) }
+        viewModelScope.launch {
+            try {
+                repository.add(FinancialItem(0, date, label.trim(), direction, amountCents))
+                savedState["selectedDate"] = date.toString()
+                val monthChanged = YearMonth.from(date) != state.value.month
+                mutableState.update {
+                    if (monthChanged) CalendarState(YearMonth.from(date), date)
+                    else it.copy(selectedDate = date, isAdding = false, isSaving = false, saveError = false)
+                }
+                if (monthChanged) observeMonth()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                mutableState.update { it.copy(isSaving = false, saveError = true) }
+            }
+        }
     }
 
     fun previousMonth() = moveMonth(-1)

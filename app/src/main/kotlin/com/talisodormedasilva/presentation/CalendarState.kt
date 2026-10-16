@@ -10,6 +10,9 @@ data class CalendarState(
     val itemsByDate: Map<LocalDate, List<FinancialItem>> = emptyMap(),
     val isLoading: Boolean = true,
     val loadError: Throwable? = null,
+    val isAdding: Boolean = false,
+    val isSaving: Boolean = false,
+    val saveError: Boolean = false,
 ) {
     val hasLoadError: Boolean get() = loadError != null
     val selectedItems: List<FinancialItem> get() = itemsByDate[selectedDate].orEmpty()

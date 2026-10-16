@@ -2,6 +2,6 @@
     <style name="Theme.FinancialCalendar" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:colorAccent">#285A47</item>
+        <item name="android:colorAccent">#6E4AA1</item>
     </style>
 </resources>
