@@ -30,19 +30,19 @@ class CalendarViewModel(
     init { observeMonth() }
 
     fun selectDate(date: LocalDate) {
-        if (YearMonth.from(date) != state.value.month) return
+        if (state.value.isSaving || YearMonth.from(date) != state.value.month) return
         savedState["selectedDate"] = date.toString()
         mutableState.update { it.copy(selectedDate = date) }
     }
 
-    fun openAddItem() { mutableState.update { it.copy(isAdding = true, saveError = false) } }
+    fun openAddItem() { if (!state.value.isSaving) mutableState.update { it.copy(isAdding = true, saveError = false) } }
 
     fun closeAddItem() {
         if (!state.value.isSaving) mutableState.update { it.copy(isAdding = false, saveError = false) }
     }
 
     fun addItem(label: String, direction: FinancialDirection, amountCents: Long, date: LocalDate) {
-        if (state.value.isSaving || label.isBlank() || label.trim().length > 90 || amountCents <= 0) return
+        if (state.value.isSaving || label.trim().isEmpty() || label.trim().length > 90 || amountCents <= 0) return
         mutableState.update { it.copy(isSaving = true, saveError = false) }
         viewModelScope.launch {
             try {
@@ -66,6 +66,7 @@ class CalendarViewModel(
     fun nextMonth() = moveMonth(1)
 
     private fun moveMonth(offset: Long) {
+        if (state.value.isSaving) return
         val month = state.value.month.plusMonths(offset)
         val date = month.atDay(minOf(state.value.selectedDate.dayOfMonth, month.lengthOfMonth()))
         savedState["selectedDate"] = date.toString()

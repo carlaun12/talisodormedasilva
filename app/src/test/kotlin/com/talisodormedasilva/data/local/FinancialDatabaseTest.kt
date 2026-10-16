@@ -50,6 +50,20 @@ class FinancialDatabaseTest {
         assertEquals(listOf(FinancialDirection.INFLOW, FinancialDirection.OUTFLOW), items.map { it.direction })
     }
 
+
+    @Test fun repositoryTrimsLabelAndRejectsWhitespaceOnly() = runBlocking {
+        val repository = RoomFinancialItemRepository(database.financialItems())
+        val day = LocalDate.of(2026, 10, 4)
+        repository.add(FinancialItem(0, day, "  Conta  ", FinancialDirection.OUTFLOW, 125))
+        assertEquals("Conta", repository.observeMonth(YearMonth.from(day)).first().single().label)
+        try {
+            repository.add(FinancialItem(0, day, "   ", FinancialDirection.OUTFLOW, 125))
+            fail("Blank labels must be rejected")
+        } catch (expected: IllegalArgumentException) {
+            assertEquals(1, repository.observeMonth(YearMonth.from(day)).first().size)
+        }
+    }
+
     @Test fun insertInvalidatesObservedMonth() = runBlocking {
         val repository = RoomFinancialItemRepository(database.financialItems())
         val initialEmission = CompletableDeferred<Unit>()
