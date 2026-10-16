@@ -21,11 +21,11 @@ class MainActivityTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun realApplicationWiringLoadsEmptyRoomDatabaseIntoCalendar() {
-        compose.onNodeWithText("Financial calendar").assertExists()
+        compose.onNodeWithTag("month-title").assertExists()
         compose.waitUntil(timeoutMillis = 10_000) {
             !ViewModelProvider(compose.activity)[CalendarViewModel::class.java].state.value.isLoading
         }
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("No financial items on this date."))
-        compose.onNodeWithText("No financial items on this date.").assertExists()
+        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nenhum lançamento neste dia"))
+        compose.onNodeWithText("Nenhum lançamento neste dia").assertExists()
     }
 }

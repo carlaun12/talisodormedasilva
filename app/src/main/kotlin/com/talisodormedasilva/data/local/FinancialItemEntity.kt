@@ -1,5 +1,6 @@
 package com.talisodormedasilva.data.local
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -13,6 +14,7 @@ internal data class FinancialItemEntity(
     val epochDay: Long,
     val label: String,
     val direction: String,
+    @ColumnInfo(defaultValue = "NULL") val amountCents: Long? = null,
 )
 
 internal fun FinancialItemEntity.toDomain() = FinancialItem(
@@ -20,6 +22,7 @@ internal fun FinancialItemEntity.toDomain() = FinancialItem(
     date = LocalDate.ofEpochDay(epochDay),
     label = label,
     direction = FinancialDirection.valueOf(direction),
+    amountCents = amountCents,
 )
 
 internal fun FinancialItem.toEntity() = FinancialItemEntity(
@@ -27,4 +30,5 @@ internal fun FinancialItem.toEntity() = FinancialItemEntity(
     epochDay = date.toEpochDay(),
     label = label,
     direction = direction.name,
+    amountCents = amountCents,
 )

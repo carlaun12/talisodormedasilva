@@ -10,6 +10,7 @@ data class FinancialItem(
     val date: LocalDate,
     val label: String,
     val direction: FinancialDirection,
+    val amountCents: Long? = null,
 )
 
 fun groupItemsByDate(items: List<FinancialItem>, month: YearMonth): Map<LocalDate, List<FinancialItem>> =

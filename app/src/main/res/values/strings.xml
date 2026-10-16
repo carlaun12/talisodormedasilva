@@ -1,14 +1,33 @@
 <resources>
     <string name="app_name">talisodormedasilva</string>
-    <string name="calendar_title">Financial calendar</string>
-    <string name="previous_month">Previous month</string>
-    <string name="next_month">Next month</string>
-    <string name="expected_inflow">Expected inflow</string>
-    <string name="expected_outflow">Obligation / expected outflow</string>
-    <string name="inflow_count">In: %1$d</string>
-    <string name="outflow_count">Out: %1$d</string>
-    <string name="date_summary">%1$s. Expected inflows: %2$d. Obligations: %3$d.</string>
-    <string name="empty_day">No financial items on this date.</string>
-    <string name="loading">Loading local financial items…</string>
-    <string name="load_error">Local financial items could not be loaded.</string>
+    <string name="month_subtitle">Seu mês financeiro · %1$d</string>
+    <string name="previous_month">Mês anterior</string>
+    <string name="next_month">Próximo mês</string>
+    <string name="expected_inflow">A receber</string>
+    <string name="expected_outflow">A pagar</string>
+    <string name="date_summary">%1$s. Entradas: %2$d. Compromissos: %3$d.</string>
+    <string name="empty_day">Nenhum lançamento neste dia</string>
+    <string name="empty_day_description">Você não tem contas, recebimentos ou eventos financeiros agendados.</string>
+    <string name="loading">Carregando itens financeiros locais…</string>
+    <string name="load_error">Não foi possível carregar os itens financeiros locais.</string>
+    <string name="amount_unavailable">Sem valor</string>
+    <string name="add_item">Adicionar item financeiro</string>
+    <string name="new_item">Novo item financeiro</string>
+    <string name="description">Descrição</string>
+    <string name="item_type">Tipo</string>
+    <string name="amount">Valor (R$)</string>
+    <string name="item_date">Data (dd/mm/aaaa)</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
+    <string name="saving">Salvando…</string>
+    <string name="invalid_entry">Informe uma descrição, um valor positivo com até duas casas decimais e uma data válida.</string>
+    <string name="save_error">Não foi possível salvar. Tente novamente.</string>
+    <plurals name="commitments">
+        <item quantity="one">%1$d compromisso</item>
+        <item quantity="other">%1$d compromissos</item>
+    </plurals>
+    <plurals name="incomes">
+        <item quantity="one">%1$d entrada</item>
+        <item quantity="other">%1$d entradas</item>
+    </plurals>
 </resources>

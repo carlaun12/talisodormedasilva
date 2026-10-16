@@ -29,6 +29,7 @@ class CalendarViewModelTest {
     @get:Rule val main = MainDispatcherRule()
 
     private fun repository(items: List<FinancialItem> = emptyList()) = object : FinancialItemRepository {
+        override suspend fun add(item: FinancialItem) { error("Unexpected write") }
         override fun observeMonth(month: YearMonth) = flowOf(items)
     }
 
@@ -66,6 +67,7 @@ class CalendarViewModelTest {
 
     @Test fun readFailureIsVisibleAndIsNotAnEmptySuccessfulResult() = runTest(main.dispatcher) {
         val failing = object : FinancialItemRepository {
+            override suspend fun add(item: FinancialItem) { error("Unexpected write") }
             override fun observeMonth(month: YearMonth): Flow<List<FinancialItem>> = flow { error("Read failed") }
         }
         withModel(failing, LocalDate.of(2026, 10, 4)) { model ->
@@ -73,6 +75,39 @@ class CalendarViewModelTest {
             assertTrue(model.state.value.hasLoadError)
             assertFalse(model.state.value.isLoading)
             assertEquals("Read failed", model.state.value.loadError?.message)
+        }
+    }
+
+    @Test fun savingPersistsTrimmedItemAndNavigatesToItsMonth() = runTest(main.dispatcher) {
+        val written = mutableListOf<FinancialItem>()
+        val source = object : FinancialItemRepository {
+            override suspend fun add(item: FinancialItem) { written += item }
+            override fun observeMonth(month: YearMonth) = flowOf(written.toList())
+        }
+        val target = LocalDate.of(2027, 1, 9)
+        withModel(source, LocalDate.of(2026, 10, 4)) { model ->
+            testScheduler.runCurrent()
+            model.openAddItem()
+            model.addItem("  Aluguel  ", FinancialDirection.OUTFLOW, 124099, target)
+            model.addItem("Duplicate", FinancialDirection.OUTFLOW, 100, target)
+            testScheduler.runCurrent()
+            assertEquals(listOf(FinancialItem(0, target, "Aluguel", FinancialDirection.OUTFLOW, 124099)), written)
+            assertEquals(target, model.state.value.selectedDate)
+            assertEquals(written, model.state.value.selectedItems)
+            assertFalse(model.state.value.isAdding)
+            assertFalse(model.state.value.isSaving)
+        }
+    }
+
+    @Test fun saveFailureKeepsFormOpenForRetry() = runTest(main.dispatcher) {
+        withModel(repository(), LocalDate.of(2026, 10, 4)) { model ->
+            testScheduler.runCurrent()
+            model.openAddItem()
+            model.addItem("Conta", FinancialDirection.OUTFLOW, 100, model.state.value.selectedDate)
+            testScheduler.runCurrent()
+            assertTrue(model.state.value.isAdding)
+            assertTrue(model.state.value.saveError)
+            assertFalse(model.state.value.isSaving)
         }
     }
 
@@ -90,6 +125,7 @@ class CalendarViewModelTest {
     @Test fun navigationCancelsPreviousMonthObservation() = runTest(main.dispatcher) {
         val months = mutableMapOf<YearMonth, MutableSharedFlow<List<FinancialItem>>>()
         val source = object : FinancialItemRepository {
+            override suspend fun add(item: FinancialItem) { error("Unexpected write") }
             override fun observeMonth(month: YearMonth) = months.getOrPut(month) { MutableSharedFlow() }
         }
         withModel(source, LocalDate.of(2026, 10, 4)) { model ->
