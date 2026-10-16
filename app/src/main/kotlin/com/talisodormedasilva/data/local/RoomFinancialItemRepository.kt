@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.map
 
 internal class RoomFinancialItemRepository(private val dao: FinancialItemDao) : FinancialItemRepository {
     override suspend fun add(item: FinancialItem) {
-        require(item.label.isNotBlank() && item.label.length <= 90)
+        val normalizedLabel = item.label.trim()
+        require(normalizedLabel.isNotEmpty() && normalizedLabel.length <= 90)
         require(item.amountCents != null && item.amountCents > 0)
-        dao.insert(item.copy(id = 0).toEntity())
+        dao.insert(item.copy(id = 0, label = normalizedLabel).toEntity())
     }
 
     override fun observeMonth(month: YearMonth) = dao.observeRange(
