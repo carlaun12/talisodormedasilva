@@ -101,9 +101,10 @@ fun CalendarScreen(
             item {
                 Column(Modifier.fillMaxWidth().background(Color(0xFFF3E6F5), RoundedCornerShape(30.dp)).padding(10.dp, 18.dp)) {
                     Row(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                        listOf("S", "T", "Q", "Q", "S", "S", "D").forEach {
-                            Box(Modifier.weight(1f).height(24.dp), contentAlignment = Alignment.Center) {
-                                Text(it, color = Color(0xFF8A788E), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        listOf("Segunda-feira" to "S", "Terça-feira" to "T", "Quarta-feira" to "Q",
+                            "Quinta-feira" to "Q", "Sexta-feira" to "S", "Sábado" to "S", "Domingo" to "D").forEach { (fullName, symbol) ->
+                            Box(Modifier.weight(1f).height(24.dp).semantics { contentDescription = fullName }, contentAlignment = Alignment.Center) {
+                                Text(symbol, color = Color(0xFF8A788E), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }

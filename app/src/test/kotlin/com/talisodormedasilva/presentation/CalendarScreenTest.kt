@@ -101,6 +101,8 @@ class CalendarScreenTest {
         compose.onNodeWithTag("entry-date").performTextInput("31/02/2024")
         compose.onNodeWithTag("save-item").performScrollTo().performClick()
         assertEquals(null, saved)
+        compose.onNodeWithText("Informe um valor maior que zero, com até duas casas decimais e sem separador de milhar.").assertExists()
+        compose.onNodeWithText("Informe uma data válida no formato dd/mm/aaaa.").assertExists()
         compose.onNodeWithTag("entry-amount").performScrollTo().performTextClearance()
         compose.onNodeWithTag("entry-amount").performTextInput("1240,99")
         compose.onNodeWithTag("entry-date").performScrollTo().performTextClearance()
