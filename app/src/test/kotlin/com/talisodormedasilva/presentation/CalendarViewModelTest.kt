@@ -7,6 +7,7 @@ import com.talisodormedasilva.domain.FinancialItem
 import com.talisodormedasilva.domain.FinancialItemRepository
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -107,6 +108,42 @@ class CalendarViewModelTest {
             testScheduler.runCurrent()
             assertTrue(model.state.value.isAdding)
             assertTrue(model.state.value.saveError)
+            assertFalse(model.state.value.isSaving)
+        }
+    }
+
+
+    @Test fun pendingSaveCannotBeInterruptedByNavigationOrAnotherSubmission() = runTest(main.dispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val written = mutableListOf<FinancialItem>()
+        val source = object : FinancialItemRepository {
+            override suspend fun add(item: FinancialItem) {
+                gate.await()
+                written += item
+            }
+            override fun observeMonth(month: YearMonth) = flowOf(written.filter { YearMonth.from(it.date) == month })
+        }
+        val initial = LocalDate.of(2026, 10, 4)
+        withModel(source, initial) { model ->
+            testScheduler.runCurrent()
+            model.openAddItem()
+            model.addItem(" Conta ", FinancialDirection.OUTFLOW, 100, initial)
+            testScheduler.runCurrent()
+            assertTrue(model.state.value.isSaving)
+            model.nextMonth()
+            model.previousMonth()
+            model.selectDate(initial.plusDays(1))
+            model.closeAddItem()
+            model.openAddItem()
+            model.addItem("Duplicado", FinancialDirection.OUTFLOW, 100, initial)
+            assertEquals(YearMonth.from(initial), model.state.value.month)
+            assertEquals(initial, model.state.value.selectedDate)
+            assertTrue(model.state.value.isAdding)
+            assertTrue(model.state.value.isSaving)
+            gate.complete(Unit)
+            testScheduler.runCurrent()
+            assertEquals(listOf(FinancialItem(0, initial, "Conta", FinancialDirection.OUTFLOW, 100)), written)
+            assertFalse(model.state.value.isAdding)
             assertFalse(model.state.value.isSaving)
         }
     }
