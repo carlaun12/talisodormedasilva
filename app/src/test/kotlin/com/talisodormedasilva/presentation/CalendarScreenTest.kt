@@ -111,6 +111,17 @@ class CalendarScreenTest {
         assertEquals(FinancialItem(0, LocalDate.of(2024, 2, 29), "Aluguel", FinancialDirection.OUTFLOW, 124099), saved)
     }
 
+    @Test fun emptyDescriptionShowsFieldSpecificError() {
+        compose.setContent {
+            CalendarTheme {
+                CalendarScreen(CalendarState(YearMonth.from(date), date, isLoading = false, isAdding = true),
+                    {}, {}, {})
+            }
+        }
+        compose.onNodeWithTag("save-item").performScrollTo().performClick()
+        compose.onNodeWithText("Informe uma descrição de até 90 caracteres.").assertExists()
+    }
+
     private fun show(state: CalendarState) {
         compose.setContent { CalendarTheme { CalendarScreen(state, {}, {}, {}) } }
     }
