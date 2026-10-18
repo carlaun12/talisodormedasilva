@@ -74,6 +74,7 @@ internal fun AddItemSheet(
             Text(stringResource(R.string.new_item), style = MaterialTheme.typography.headlineSmall)
             OutlinedTextField(label, { label = it.take(90) }, modifier = Modifier.fillMaxWidth().testTag("entry-description"),
                 label = { Text(stringResource(R.string.description)) }, singleLine = true, enabled = !isSaving,
+                supportingText = if (submitted && !labelValid) { { Text(stringResource(R.string.description_error)) } } else null,
                 isError = submitted && !labelValid,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences))
             Text(stringResource(R.string.item_type), style = MaterialTheme.typography.labelLarge)
@@ -86,14 +87,13 @@ internal fun AddItemSheet(
             OutlinedTextField(amount, { amount = it }, modifier = Modifier.fillMaxWidth().testTag("entry-amount"),
                 label = { Text(stringResource(R.string.amount)) }, placeholder = { Text("0,00") },
                 singleLine = true, enabled = !isSaving, isError = submitted && cents == null,
+                supportingText = if (submitted && cents == null) { { Text(stringResource(R.string.amount_error)) } } else null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
             OutlinedTextField(date, { date = it }, modifier = Modifier.fillMaxWidth().testTag("entry-date"),
                 label = { Text(stringResource(R.string.item_date)) }, placeholder = { Text("dd/mm/aaaa") },
                 singleLine = true, enabled = !isSaving, isError = submitted && parsedDate == null,
+                supportingText = if (submitted && parsedDate == null) { { Text(stringResource(R.string.date_error)) } } else null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text))
-            if (submitted && (!labelValid || cents == null || parsedDate == null)) {
-                Text(stringResource(R.string.invalid_entry), color = MaterialTheme.colorScheme.error)
-            }
             if (saveError) Text(stringResource(R.string.save_error), color = MaterialTheme.colorScheme.error)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 FilledTonalButton(onClick = onDismiss, enabled = !isSaving, modifier = Modifier.weight(1f)) {

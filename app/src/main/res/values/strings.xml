@@ -20,6 +20,9 @@
     <string name="cancel">Cancelar</string>
     <string name="save">Salvar</string>
     <string name="saving">Salvando…</string>
+    <string name="description_error">Informe uma descrição de até 90 caracteres.</string>
+    <string name="amount_error">Informe um valor maior que zero, com até duas casas decimais e sem separador de milhar.</string>
+    <string name="date_error">Informe uma data válida no formato dd/mm/aaaa.</string>
     <string name="invalid_entry">Informe uma descrição, um valor positivo com até duas casas decimais e uma data válida.</string>
     <string name="save_error">Não foi possível salvar. Tente novamente.</string>
     <plurals name="commitments">

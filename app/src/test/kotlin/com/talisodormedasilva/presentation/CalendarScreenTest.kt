@@ -101,12 +101,25 @@ class CalendarScreenTest {
         compose.onNodeWithTag("entry-date").performTextInput("31/02/2024")
         compose.onNodeWithTag("save-item").performScrollTo().performClick()
         assertEquals(null, saved)
+        compose.onNodeWithText("Informe um valor maior que zero, com até duas casas decimais e sem separador de milhar.").assertExists()
+        compose.onNodeWithText("Informe uma data válida no formato dd/mm/aaaa.").assertExists()
         compose.onNodeWithTag("entry-amount").performScrollTo().performTextClearance()
         compose.onNodeWithTag("entry-amount").performTextInput("1240,99")
         compose.onNodeWithTag("entry-date").performScrollTo().performTextClearance()
         compose.onNodeWithTag("entry-date").performTextInput("29/02/2024")
         compose.onNodeWithTag("save-item").performScrollTo().performClick()
         assertEquals(FinancialItem(0, LocalDate.of(2024, 2, 29), "Aluguel", FinancialDirection.OUTFLOW, 124099), saved)
+    }
+
+    @Test fun emptyDescriptionShowsFieldSpecificError() {
+        compose.setContent {
+            CalendarTheme {
+                CalendarScreen(CalendarState(YearMonth.from(date), date, isLoading = false, isAdding = true),
+                    {}, {}, {})
+            }
+        }
+        compose.onNodeWithTag("save-item").performScrollTo().performClick()
+        compose.onNodeWithText("Informe uma descrição de até 90 caracteres.").assertExists()
     }
 
     private fun show(state: CalendarState) {
