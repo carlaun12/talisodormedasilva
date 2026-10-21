@@ -55,6 +55,24 @@ class CalendarViewModelTest {
         }
     }
 
+    @Test fun addActionRequiresDayTapAndResetsOnMonthNavigation() = runTest(main.dispatcher) {
+        val initial = LocalDate.of(2026, 10, 21)
+        withModel(repository(), initial) { model ->
+            testScheduler.runCurrent()
+            assertFalse(model.state.value.showAddAction)
+
+            // Tapping even the already-highlighted initial date must reveal the action.
+            model.selectDate(initial)
+            assertTrue(model.state.value.showAddAction)
+            model.nextMonth()
+            assertFalse(model.state.value.showAddAction)
+            model.selectDate(initial)
+            assertFalse(model.state.value.showAddAction)
+            model.selectDate(model.state.value.selectedDate)
+            assertTrue(model.state.value.showAddAction)
+        }
+    }
+
     @Test fun monthNavigationClampsDayAndCrossesYearBoundary() = runTest(main.dispatcher) {
         withModel(repository(), LocalDate.of(2024, 1, 31)) { model ->
             testScheduler.runCurrent()
@@ -154,7 +172,10 @@ class CalendarViewModelTest {
         val store = ViewModelStore().apply { put("calendar", model) }
         try {
             assertEquals(LocalDate.of(2024, 2, 29), model.state.value.selectedDate)
+            assertFalse(model.state.value.showAddAction)
             model.selectDate(LocalDate.of(2024, 2, 28))
+            assertTrue(model.state.value.showAddAction)
+            assertEquals(true, saved.get<Boolean>("showAddAction"))
             assertEquals("2024-02-28", saved.get<String>("selectedDate"))
         } finally { store.clear() }
     }
