@@ -10,6 +10,7 @@ data class CalendarState(
     val itemsByDate: Map<LocalDate, List<FinancialItem>> = emptyMap(),
     val isLoading: Boolean = true,
     val loadError: Throwable? = null,
+    val showAddAction: Boolean = false,
     val isAdding: Boolean = false,
     val isSaving: Boolean = false,
     val saveError: Boolean = false,
