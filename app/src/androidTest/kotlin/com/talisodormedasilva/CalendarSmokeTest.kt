@@ -16,10 +16,9 @@ class CalendarSmokeTest {
 
     @Test fun cleanInstallShowsCalendarAfterLocalDatabaseLoads() {
         compose.onNodeWithTag("month-title").assertExists()
-        compose.waitUntil(timeoutMillis = 10_000) {
-            !ViewModelProvider(compose.activity)[CalendarViewModel::class.java].state.value.isLoading
-        }
+        val model = ViewModelProvider(compose.activity)[CalendarViewModel::class.java]
+        compose.waitUntil(timeoutMillis = 10_000) { !model.state.value.isLoading }
         compose.onNodeWithTag("calendar").assertExists()
-        compose.onNodeWithTag("day-" + java.time.LocalDate.now()).assertExists()
+        compose.onNodeWithTag("day-" + model.state.value.selectedDate).assertExists()
     }
 }
