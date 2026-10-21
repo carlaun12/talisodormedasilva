@@ -1,6 +1,8 @@
 package com.talisodormedasilva.presentation
 
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -40,6 +42,29 @@ class CalendarScreenTest {
         compose.onNodeWithTag("total-due").assertDoesNotExist()
         compose.onNodeWithText("Income fixture").assertDoesNotExist()
         compose.onNodeWithText("Card obligation fixture").assertDoesNotExist()
+    }
+
+    @Test fun addButtonAppearsOnlyAfterTappingDay() {
+        val visibleState = mutableStateOf(CalendarState(YearMonth.from(date), date, isLoading = false))
+        var openCount = 0
+        compose.setContent {
+            CalendarTheme {
+                CalendarScreen(
+                    state = visibleState.value,
+                    onPreviousMonth = {},
+                    onNextMonth = {},
+                    onSelectDate = { selected ->
+                        visibleState.value = visibleState.value.copy(selectedDate = selected, showAddAction = true)
+                    },
+                    onOpenAddItem = { openCount++ },
+                )
+            }
+        }
+        compose.onNodeWithTag("add-item").assertDoesNotExist()
+        compose.onNodeWithTag("day-$date").performScrollTo().performClick()
+        compose.onNodeWithTag("calendar").performScrollToNode(hasTestTag("add-item"))
+        compose.onNodeWithTag("add-item").assertExists().performClick()
+        assertEquals(1, openCount)
     }
 
     @Test fun emptyDayDoesNotRenderDayDetails() {
