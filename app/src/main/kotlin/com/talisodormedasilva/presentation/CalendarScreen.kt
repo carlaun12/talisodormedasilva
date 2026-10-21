@@ -134,11 +134,11 @@ fun CalendarScreen(
             if (state.showAddAction) {
                 item {
                     Button(onClick = onOpenAddItem, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("add-item"),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF17141B), contentColor = Color.White)) {
-                    Text("+", fontSize = 22.sp)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.add_item), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF17141B), contentColor = Color.White)) {
+                        Text("+", fontSize = 22.sp)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.add_item), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
