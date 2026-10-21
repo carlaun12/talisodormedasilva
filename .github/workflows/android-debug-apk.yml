@@ -57,15 +57,15 @@ jobs:
           branch_slug="$(printf '%s' "$GITHUB_REF_NAME" | sed 's/[^[:alnum:]._-]/-/g')"
           release_tag="debug-${branch_slug}"
           apk_path="app/build/outputs/apk/debug/app-debug.apk"
-          apk_name="talisodormedasilva-debug.apk"
+          apk_name="app-debug.apk"
           release_notes="Build de desenvolvimento (não destinado a produção). Branch: ${GITHUB_REF_NAME}. Commit: ${GITHUB_SHA}. Android Debug APK, assinado com a chave de depuração."
 
           test -s "$apk_path"
           if gh release view "$release_tag" >/dev/null 2>&1; then
-            gh release upload "$release_tag" "${apk_path}#${apk_name}" --clobber
+            gh release upload "$release_tag" "$apk_path" --clobber
             gh release edit "$release_tag" --notes "$release_notes"
           else
-            gh release create "$release_tag" "${apk_path}#${apk_name}" \
+            gh release create "$release_tag" "$apk_path" \
               --target "$GITHUB_SHA" \
               --title "APK Debug — ${GITHUB_REF_NAME}" \
               --notes "$release_notes" \
