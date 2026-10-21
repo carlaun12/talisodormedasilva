@@ -1,7 +1,6 @@
 package com.talisodormedasilva.presentation
 
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -30,25 +29,23 @@ class CalendarScreenTest {
     @get:Rule val compose = createComposeRule()
     private val date = LocalDate.of(2024, 2, 15)
 
-    @Test fun datedFixtureShowsBothDirections() {
+    @Test fun financialPanelsAreHiddenWhileDaySelectionRemains() {
         val fixture = listOf(
             FinancialItem(1, date, "Income fixture", FinancialDirection.INFLOW),
             FinancialItem(2, date, "Card obligation fixture", FinancialDirection.OUTFLOW),
         )
         show(CalendarState(YearMonth.from(date), date, mapOf(date to fixture), isLoading = false))
         compose.onNodeWithTag("day-$date").assertIsSelected()
-        compose.onNodeWithTag("total-incoming").assertExists()
-        compose.onNodeWithTag("total-due").assertExists()
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Income fixture"))
-        compose.onNodeWithText("Income fixture").assertExists()
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Card obligation fixture"))
-        compose.onNodeWithText("Card obligation fixture").assertExists()
+        compose.onNodeWithTag("total-incoming").assertDoesNotExist()
+        compose.onNodeWithTag("total-due").assertDoesNotExist()
+        compose.onNodeWithText("Income fixture").assertDoesNotExist()
+        compose.onNodeWithText("Card obligation fixture").assertDoesNotExist()
     }
 
-    @Test fun emptyDatabaseHasExplicitEmptyState() {
+    @Test fun emptyDayDoesNotRenderDayDetails() {
         show(CalendarState(YearMonth.from(date), date, isLoading = false))
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Nenhum lançamento neste dia"))
-        compose.onNodeWithText("Nenhum lançamento neste dia").assertExists()
+        compose.onNodeWithTag("day-$date").assertIsSelected()
+        compose.onNodeWithText("Nenhum lançamento neste dia").assertDoesNotExist()
     }
 
     @Test fun readFailureIsVisible() {
@@ -73,18 +70,6 @@ class CalendarScreenTest {
         assertEquals(1, previous)
         assertEquals(1, next)
         assertEquals(LocalDate.of(2024, 2, 16), selected)
-    }
-
-    @Test fun summaryShowsMonthlyTotalsIncludingOtherDates() {
-        val fixture = listOf(
-            FinancialItem(1, date, "Conta", FinancialDirection.OUTFLOW, 124099),
-            FinancialItem(2, date, "Cliente", FinancialDirection.INFLOW, 168000),
-        )
-        val other = date.plusDays(1)
-        show(CalendarState(YearMonth.from(date), date, mapOf(date to fixture,
-            other to listOf(FinancialItem(3, other, "Projeto", FinancialDirection.INFLOW, 200000))), isLoading = false))
-        compose.onNodeWithTag("total-due").assertTextEquals(money(124099))
-        compose.onNodeWithTag("total-incoming").assertTextEquals(money(368000))
     }
 
     @Test fun formRejectsInvalidAmountAndDateThenSubmitsValidEntry() {
