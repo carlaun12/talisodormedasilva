@@ -2,13 +2,16 @@ name: Android Debug APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - ui/remove-day-details-and-monthly-summary
 
 concurrency:
   group: android-debug-apk-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   run:
@@ -43,3 +46,42 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+      - name: Publish directly downloadable debug APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # One mutable prerelease per branch, providing a stable direct APK URL.
+          branch_slug="$(printf '%s' "$GITHUB_REF_NAME" | sed 's/[^[:alnum:]._-]/-/g')"
+          release_tag="debug-${branch_slug}"
+          apk_path="app/build/outputs/apk/debug/app-debug.apk"
+          apk_name="talisodormedasilva-debug.apk"
+          release_notes="Build de desenvolvimento (não destinado a produção). Branch: ${GITHUB_REF_NAME}. Commit: ${GITHUB_SHA}. Android Debug APK, assinado com a chave de depuração."
+
+          test -s "$apk_path"
+          if gh release view "$release_tag" >/dev/null 2>&1; then
+            gh release upload "$release_tag" "${apk_path}#${apk_name}" --clobber
+            gh release edit "$release_tag" --notes "$release_notes"
+          else
+            gh release create "$release_tag" "${apk_path}#${apk_name}" \
+              --target "$GITHUB_SHA" \
+              --title "APK Debug — ${GITHUB_REF_NAME}" \
+              --notes "$release_notes" \
+              --prerelease
+          fi
+
+          direct_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${release_tag}/${apk_name}"
+          {
+            echo "## APK pronto para baixar"
+            echo ""
+            echo "[Baixar APK diretamente](${direct_url})"
+            echo ""
+            echo "Branch: \`${GITHUB_REF_NAME}\`"
+            echo ""
+            echo "Commit: \`${GITHUB_SHA}\`"
+            echo ""
+            echo "APK de depuração; a release é pública neste repositório público."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Direct APK: $direct_url"
