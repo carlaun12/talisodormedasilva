@@ -1,15 +1,15 @@
 package com.talisodormedasilva.presentation
 
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.swipeLeft
@@ -46,7 +46,7 @@ class CalendarScreenTest {
         compose.onNodeWithText("Card obligation fixture").assertDoesNotExist()
     }
 
-    @Test fun removedHeaderAndActionStayHiddenAfterSelectingDate() {
+    @Test fun monthHeadingIsVisibleAndRemovedControlsStayHidden() {
         val visibleState = mutableStateOf(CalendarState(YearMonth.from(date), date, isLoading = false))
         compose.setContent {
             CalendarTheme {
@@ -60,13 +60,23 @@ class CalendarScreenTest {
                 )
             }
         }
-        compose.onNodeWithTag("month-title").assertDoesNotExist()
+        compose.onNodeWithTag("month-heading").assertTextEquals("Fevereiro")
+        compose.onNodeWithTag("month-subtitle").assertTextEquals("Seu mês financeiro · 2024")
         compose.onNodeWithTag("previous-month").assertDoesNotExist()
         compose.onNodeWithTag("next-month").assertDoesNotExist()
         compose.onNodeWithTag("add-item").assertDoesNotExist()
-        compose.onNodeWithTag("day-${date.plusDays(1)}").performScrollTo().performClick()
+        compose.onNodeWithTag("day-${date.plusDays(1)}").performClick()
         compose.onNodeWithTag("day-${date.plusDays(1)}").assertIsSelected()
         compose.onNodeWithTag("add-item").assertDoesNotExist()
+    }
+
+    @Test fun sixWeekMonthFitsWithoutScrolling() {
+        val august = YearMonth.of(2026, 8)
+        show(CalendarState(august, august.atDay(1), isLoading = false))
+        assertEquals(42, monthSlots(august).size)
+        compose.onNodeWithTag("month-heading").assertTextEquals("Agosto")
+        compose.onNodeWithTag("month-grid").assertIsDisplayed()
+        compose.onNodeWithTag("day-2026-08-31").assertIsDisplayed()
     }
 
     @Test fun emptyDayDoesNotRenderDayDetails() {
@@ -77,7 +87,6 @@ class CalendarScreenTest {
 
     @Test fun readFailureIsVisible() {
         show(CalendarState(YearMonth.from(date), date, isLoading = false, loadError = IllegalStateException("Fixture read failure")))
-        compose.onNodeWithTag("calendar").performScrollToNode(hasText("Não foi possível carregar os itens financeiros locais."))
         compose.onNodeWithText("Não foi possível carregar os itens financeiros locais.").assertExists()
     }
 
@@ -93,7 +102,7 @@ class CalendarScreenTest {
         }
         compose.onNodeWithTag("month-grid").performTouchInput { swipeRight() }
         compose.onNodeWithTag("month-grid").performTouchInput { swipeLeft() }
-        compose.onNodeWithTag("day-2024-02-16").performScrollTo().performClick()
+        compose.onNodeWithTag("day-2024-02-16").performClick()
         assertEquals(1, previous)
         assertEquals(1, next)
         assertEquals(LocalDate.of(2024, 2, 16), selected)
