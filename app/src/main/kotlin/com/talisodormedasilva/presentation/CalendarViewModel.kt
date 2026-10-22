@@ -23,11 +23,7 @@ class CalendarViewModel(
     initialDate: LocalDate = LocalDate.now(),
 ) : ViewModel() {
     private val restoredDate = savedState.get<String>("selectedDate")?.let(LocalDate::parse) ?: initialDate
-    private val mutableState = MutableStateFlow(CalendarState(
-        YearMonth.from(restoredDate),
-        restoredDate,
-        showAddAction = savedState.get<Boolean>("showAddAction") ?: false,
-    ))
+    private val mutableState = MutableStateFlow(CalendarState(YearMonth.from(restoredDate), restoredDate))
     val state = mutableState.asStateFlow()
     private var observation: Job? = null
 
@@ -36,8 +32,7 @@ class CalendarViewModel(
     fun selectDate(date: LocalDate) {
         if (state.value.isSaving || YearMonth.from(date) != state.value.month) return
         savedState["selectedDate"] = date.toString()
-        savedState["showAddAction"] = true
-        mutableState.update { it.copy(selectedDate = date, showAddAction = true) }
+        mutableState.update { it.copy(selectedDate = date) }
     }
 
     fun openAddItem() { if (!state.value.isSaving) mutableState.update { it.copy(isAdding = true, saveError = false) } }
@@ -54,7 +49,6 @@ class CalendarViewModel(
                 repository.add(FinancialItem(0, date, label.trim(), direction, amountCents))
                 savedState["selectedDate"] = date.toString()
                 val monthChanged = YearMonth.from(date) != state.value.month
-                if (monthChanged) savedState["showAddAction"] = false
                 mutableState.update {
                     if (monthChanged) CalendarState(YearMonth.from(date), date)
                     else it.copy(selectedDate = date, isAdding = false, isSaving = false, saveError = false)
@@ -76,7 +70,6 @@ class CalendarViewModel(
         val month = state.value.month.plusMonths(offset)
         val date = month.atDay(minOf(state.value.selectedDate.dayOfMonth, month.lengthOfMonth()))
         savedState["selectedDate"] = date.toString()
-        savedState["showAddAction"] = false
         mutableState.value = CalendarState(month, date)
         observeMonth()
     }

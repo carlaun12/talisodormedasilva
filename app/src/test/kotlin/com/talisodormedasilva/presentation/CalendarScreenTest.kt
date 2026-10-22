@@ -2,16 +2,18 @@ package com.talisodormedasilva.presentation
 
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import com.talisodormedasilva.domain.FinancialDirection
 import com.talisodormedasilva.domain.FinancialItem
 import java.time.LocalDate
@@ -44,9 +46,8 @@ class CalendarScreenTest {
         compose.onNodeWithText("Card obligation fixture").assertDoesNotExist()
     }
 
-    @Test fun addButtonAppearsOnlyAfterTappingDay() {
+    @Test fun removedHeaderAndActionStayHiddenAfterSelectingDate() {
         val visibleState = mutableStateOf(CalendarState(YearMonth.from(date), date, isLoading = false))
-        var openCount = 0
         compose.setContent {
             CalendarTheme {
                 CalendarScreen(
@@ -54,17 +55,18 @@ class CalendarScreenTest {
                     onPreviousMonth = {},
                     onNextMonth = {},
                     onSelectDate = { selected ->
-                        visibleState.value = visibleState.value.copy(selectedDate = selected, showAddAction = true)
+                        visibleState.value = visibleState.value.copy(selectedDate = selected)
                     },
-                    onOpenAddItem = { openCount++ },
                 )
             }
         }
+        compose.onNodeWithTag("month-title").assertDoesNotExist()
+        compose.onNodeWithTag("previous-month").assertDoesNotExist()
+        compose.onNodeWithTag("next-month").assertDoesNotExist()
         compose.onNodeWithTag("add-item").assertDoesNotExist()
-        compose.onNodeWithTag("day-$date").performScrollTo().performClick()
-        compose.onNodeWithTag("calendar").performScrollToNode(hasTestTag("add-item"))
-        compose.onNodeWithTag("add-item").assertExists().performClick()
-        assertEquals(1, openCount)
+        compose.onNodeWithTag("day-${date.plusDays(1)}").performScrollTo().performClick()
+        compose.onNodeWithTag("day-${date.plusDays(1)}").assertIsSelected()
+        compose.onNodeWithTag("add-item").assertDoesNotExist()
     }
 
     @Test fun emptyDayDoesNotRenderDayDetails() {
@@ -79,7 +81,7 @@ class CalendarScreenTest {
         compose.onNodeWithText("Não foi possível carregar os itens financeiros locais.").assertExists()
     }
 
-    @Test fun navigationAndDateSelectionEmitEvents() {
+    @Test fun swipingCalendarNavigatesMonthsAndTappingSelectsDate() {
         var previous = 0
         var next = 0
         var selected: LocalDate? = null
@@ -89,8 +91,8 @@ class CalendarScreenTest {
                     { previous++ }, { next++ }, { selected = it })
             }
         }
-        compose.onNodeWithTag("previous-month").performClick()
-        compose.onNodeWithTag("next-month").performClick()
+        compose.onNodeWithTag("month-grid").performTouchInput { swipeRight() }
+        compose.onNodeWithTag("month-grid").performTouchInput { swipeLeft() }
         compose.onNodeWithTag("day-2024-02-16").performScrollTo().performClick()
         assertEquals(1, previous)
         assertEquals(1, next)

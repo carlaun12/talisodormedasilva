@@ -1,10 +1,9 @@
 package com.talisodormedasilva
 
-import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,13 +18,13 @@ class CalendarSmokeTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
     @Test fun cleanInstallShowsCalendarAfterLocalDatabaseLoads() {
-        compose.onNodeWithTag("month-title").assertExists()
+        compose.onNodeWithTag("month-grid").assertExists()
         val model = ViewModelProvider(compose.activity)[CalendarViewModel::class.java]
         compose.waitUntil(timeoutMillis = 10_000) { !model.state.value.isLoading }
         compose.onNodeWithTag("calendar").assertExists()
         compose.onNodeWithTag("add-item").assertDoesNotExist()
         compose.onNodeWithTag("day-" + model.state.value.selectedDate).performScrollTo().performClick()
-        compose.onNodeWithTag("calendar").performScrollToNode(hasTestTag("add-item"))
-        compose.onNodeWithTag("add-item").assertExists()
+        compose.onNodeWithTag("day-" + model.state.value.selectedDate).assertIsSelected()
+        compose.onNodeWithTag("add-item").assertDoesNotExist()
     }
 }

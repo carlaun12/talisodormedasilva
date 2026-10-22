@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
                         onPreviousMonth = model::previousMonth,
                         onNextMonth = model::nextMonth,
                         onSelectDate = model::selectDate,
-                        onOpenAddItem = model::openAddItem,
                         onCloseAddItem = model::closeAddItem,
                         onSaveItem = model::addItem,
                         modifier = Modifier.padding(padding),
