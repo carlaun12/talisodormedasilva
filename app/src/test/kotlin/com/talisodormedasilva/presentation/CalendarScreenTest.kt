@@ -76,7 +76,31 @@ class CalendarScreenTest {
         assertEquals(42, monthSlots(august).size)
         compose.onNodeWithTag("month-heading").assertTextEquals("Agosto")
         compose.onNodeWithTag("month-grid").assertIsDisplayed()
+        (1..6).forEach { compose.onNodeWithTag("week-$it").assertIsDisplayed() }
+        compose.onNodeWithTag("week-label-6").assertTextEquals("Semana 6")
         compose.onNodeWithTag("day-2026-08-31").assertIsDisplayed()
+    }
+
+    @Test fun octoberIsSeparatedIntoFiveWeeklyCards() {
+        val october = YearMonth.of(2026, 10)
+        show(CalendarState(october, october.atDay(21), isLoading = false))
+        assertEquals(35, monthSlots(october).size)
+        (1..5).forEach { compose.onNodeWithTag("week-$it").assertIsDisplayed() }
+        compose.onNodeWithTag("week-6").assertDoesNotExist()
+        compose.onNodeWithTag("week-label-1").assertTextEquals("Semana 1")
+        compose.onNodeWithTag("week-label-5").assertTextEquals("Semana 5")
+        compose.onNodeWithTag("day-2026-10-21").assertIsSelected()
+        compose.onNodeWithTag("day-2026-10-31").assertIsDisplayed()
+        compose.onNodeWithTag("add-item").assertDoesNotExist()
+    }
+
+    @Test fun februaryWithFourWeeksHasFourCards() {
+        val february = YearMonth.of(2021, 2)
+        show(CalendarState(february, february.atDay(10), isLoading = false))
+        assertEquals(28, monthSlots(february).size)
+        (1..4).forEach { compose.onNodeWithTag("week-$it").assertIsDisplayed() }
+        compose.onNodeWithTag("week-5").assertDoesNotExist()
+        compose.onNodeWithTag("day-2021-02-28").assertIsDisplayed()
     }
 
     @Test fun emptyDayDoesNotRenderDayDetails() {

@@ -19,6 +19,7 @@ class CalendarSmokeTest {
     @Test fun cleanInstallShowsCalendarAfterLocalDatabaseLoads() {
         compose.onNodeWithTag("month-heading").assertExists()
         compose.onNodeWithTag("month-grid").assertExists()
+        compose.onNodeWithTag("week-1").assertExists()
         val model = ViewModelProvider(compose.activity)[CalendarViewModel::class.java]
         compose.waitUntil(timeoutMillis = 10_000) { !model.state.value.isLoading }
         compose.onNodeWithTag("calendar").assertExists()
