@@ -154,11 +154,11 @@ private fun WeekCard(
             Surface(
                 color = Color(0xFFEADCF0),
                 shape = RoundedCornerShape(18.dp),
-                modifier = Modifier.testTag("week-label-$weekNumber"),
             ) {
                 Text(
                     text = "Semana $weekNumber",
-                    modifier = Modifier.padding(horizontal = 11.dp, vertical = if (compact) 2.dp else 4.dp),
+                    modifier = Modifier.testTag("week-label-$weekNumber")
+                        .padding(horizontal = 11.dp, vertical = if (compact) 2.dp else 4.dp),
                     fontSize = if (compact) 12.sp else 13.sp,
                     lineHeight = if (compact) 14.sp else 16.sp,
                     fontWeight = FontWeight.SemiBold,
